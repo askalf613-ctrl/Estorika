@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nebula Idle</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:#0b1020;
+    color:white;
+}
+
+#topBar{
+    padding:15px;
+    background:#111827;
+    position:sticky;
+    top:0;
+}
+
+#money{ font-size:18px; font-weight:bold; }
+#power{ margin-top:5px; }
+
+button{
+    background:#22d3ee;
+    border:none;
+    padding:10px;
+    border-radius:10px;
+    font-weight:bold;
+    margin-top:10px;
+    width:100%;
+}
+
+#inventoryPanel{
+    padding:15px;
+}
+
+.item{
+    background:#1f2937;
+    padding:10px;
+    border-radius:10px;
+    margin-bottom:10px;
+    font-size:14px;
+}
+
+.smallBtn{
+    margin-top:5px;
+    padding:6px;
+    font-size:12px;
+}
+
+/* rarity renk */
+.common{ color:#9ca3af; }
+.rare{ color:#60a5fa; }
+.epic{ color:#c084fc; }
+.legendary{ color:#fbbf24; }
+
+</style>
+</head>
+
+<body>
+
+<!-- MÜZİK -->
+<audio id="bgm" loop>
+  <source src="music.mp4" type="audio/mp4">
+</audio>
+
+<div id="topBar">
+    <div id="money">Para: 0</div>
+    <div id="power">Güç: 0</div>
+    <div id="equipped">Takılı: Yok</div>
+
+    <button onclick="openChest()">Sandık Aç (100)</button>
+    <button onclick="toggleMusic()">Müzik Aç/Kapat</button>
+    <button onclick="resetGame()">Sıfırla</button>
+</div>
+
+<div id="inventoryPanel">
+    <h2>Envanter</h2>
+    <div id="inventoryList"></div>
+</div>
+
+<script>
+/* DATA */
+let money = 1000;
+let inventory = [];
+let equipped = null;
+
+/* LOAD */
+const save = JSON.parse(localStorage.getItem("save"));
+if(save){
+    money = save.money;
+    inventory = save.inventory;
+    equipped = save.equipped;
+}
+
+/* SAVE */
+function saveGame(){
+    localStorage.setItem("save", JSON.stringify({
+        money, inventory, equipped
+    }));
+}
+
+/* RARITY */
+function rollRarity(){
+    let r = Math.random()*100;
+    if(r < 60) return "common";
+    if(r < 85) return "rare";
+    if(r < 97) return "epic";
+    return "legendary";
+}
+
+/* BASE POWER */
+function rarityPower(r){
+    if(r=="common") return rand(5,10);
+    if(r=="rare") return rand(10,20);
+    if(r=="epic") return rand(20,35);
+    return rand(35,60);
+}
+
+function rand(a,b){
+    return Math.floor(Math.random()*(b-a+1))+a;
+}
+
+/* CHEST */
+function openChest(){
+    if(money < 100) return alert("Para yetmez");
+    money -= 100;
+
+    const rarity = rollRarity();
+    const item = {
+        id: Date.now() + Math.random(),
+        name: rarity.toUpperCase()+" Item",
+        rarity: rarity,
+        power: rarityPower(rarity),
+        level: 1
+    };
+
+    inventory.push(item);
+
+    if(navigator.vibrate) navigator.vibrate(100);
+
+    render();
+    saveGame();
+}
+
+/* EQUIP */
+function equipItem(id){
+    equipped = id;
+    render();
+    saveGame();
+}
+
+/* DELETE */
+function deleteItem(id){
+    if(equipped === id) equipped = null;
+    inventory = inventory.filter(i=>i.id!==id);
+    render();
+    saveGame();
+}
+
+/* UPGRADE */
+function upgradeItem(id){
+    const item = inventory.find(i=>i.id===id);
+    const cost = item.level * 50;
+    if(money < cost) return alert("Para yetmez");
+    money -= cost;
+    item.level++;
+    item.power += rand(2,5);
+    render();
+    saveGame();
+}
+
+/* POWER */
+function getPower(){
+    if(!equipped) return 0;
+    const item = inventory.find(i=>i.id===equipped);
+    return item ? item.power : 0;
+}
+
+/* RENDER */
+function render(){
+    document.getElementById("money").innerText = "Para: " + money;
+    document.getElementById("power").innerText = "Güç: " + getPower();
+
+    const eq = inventory.find(i=>i.id===equipped);
+    document.getElementById("equipped").innerText =
+        "Takılı: " + (eq ? eq.name+" +" + eq.level : "Yok");
+
+    const list = document.getElementById("inventoryList");
+    list.innerHTML = "";
+
+    inventory.forEach(item=>{
+        const div = document.createElement("div");
+        div.className = "item " + item.rarity;
+
+        div.innerHTML = `
+            <b>${item.name}</b><br>
+            Güç: ${item.power} | Lv: ${item.level}<br>
+        `;
+
+        const eqBtn = document.createElement("button");
+        eqBtn.className="smallBtn";
+        eqBtn.innerText = "Tak";
+        eqBtn.onclick = ()=>equipItem(item.id);
+
+        const upBtn = document.createElement("button");
+        upBtn.className="smallBtn";
+        upBtn.innerText = "Yükselt";
+        upBtn.onclick = ()=>upgradeItem(item.id);
+
+        const delBtn = document.createElement("button");
+        delBtn.className="smallBtn";
+        delBtn.innerText = "Sil";
+        delBtn.onclick = ()=>deleteItem(item.id);
+
+        div.appendChild(eqBtn);
+        div.appendChild(upBtn);
+        div.appendChild(delBtn);
+
+        list.appendChild(div);
+    });
+}
+
+/* RESET */
+function resetGame(){
+    localStorage.removeItem("save");
+    location.reload();
+}
+
+/* MUSIC */
+let musicOn=false;
+function toggleMusic(){
+    const m = document.getElementById("bgm");
+    if(!musicOn){ m.play(); }
+    else{ m.pause(); }
+    musicOn=!musicOn;
+}
+
+/* START */
+render();
+</script>
+
+</body>
+</html>
