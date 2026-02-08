@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Nebula Idle</title>
+<title>Nebula Idle - Auto Chest & Eternal Market</title>
 <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
 <style>
 body{margin:0;font-family:'Creepster',cursive;background:radial-gradient(circle,#0a0015,#000);color:#d0c0ff}
@@ -15,30 +15,11 @@ button{background:linear-gradient(135deg,#6a00ff,#c300ff);border:none;padding:6p
 #content>div.active{display:block}
 .item{background:rgba(30,0,60,.7);border:1px solid #6a00ff;padding:8px;border-radius:8px;margin:6px 0}
 .equipped{border:2px solid gold}
-.common{color:#ddd}.uncommon{color:#6effa3}.rare{color:#4fc3ff}.epic{color:#c77dff}.legendary{color:gold}.mythic{color:#ff4fd8}.cosmic{color:#00f7ff}
-.eternal{color:#ffffff;text-shadow:0 0 10px #fff,0 0 25px #00f7ff}
-
+.common{color:#ddd}.uncommon{color:#6effa3}.rare{color:#4fc3ff}.epic{color:#c77dff}.legendary{color:gold}.mythic{color:#ff4fd8}.cosmic{color:#00f7ff}.divine{color:#ff9900}.celestial{color:#00ffff}.eternal{color:#ffffff;text-shadow:0 0 10px #fff,0 0 25px #00f7ff}
 #chestIcon{font-size:90px;text-align:center;cursor:pointer}
-
 .shop-card{display:flex;justify-content:space-between;align-items:center;background:rgba(20,0,40,.7);border:1px solid #9a3cff;padding:8px;border-radius:8px;margin:6px 0}
-
-/* JACKPOT YAZISI */
-#eternalMsg{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.85);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:40px;
-    color:white;
-    text-align:center;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .5s;
-    z-index:9999;
-}
-#eternalMsg.show{opacity:1;}
+#eternalMsg{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:center;font-size:40px;color:white;opacity:0;pointer-events:none;transition:.5s;z-index:999}
+#eternalMsg.show{opacity:1}
 </style>
 </head>
 <body>
@@ -50,6 +31,7 @@ button{background:linear-gradient(135deg,#6a00ff,#c300ff);border:none;padding:6p
 <div>Takılı Güç: <span id="power"></span></div>
 <div>Slot: <span id="slots"></span></div>
 <div>Rebirth: <span id="rebirth"></span> | Nebula: <span id="nebula"></span></div>
+<div>Rebirth için gereken güç: <span id="rebNeed"></span></div>
 
 <div id="chestIcon">🗝️</div>
 
@@ -78,50 +60,40 @@ let nebula=0;
 let inventory=[];
 let maxSlots=3;
 let invCap=40;
-
-const SAVE="nebulaJackpot";
+let chestCount=0;
+let upgrades={chestDiscount:0,moneyMulti:1,startMoney:0,marketScaling:1};
+let eternalInMarket=false; // jackpot item market eklenmiş mi
+const SAVE="nebulaAutoEternal";
 
 /* ================= HELPERS ================= */
 const $=id=>document.getElementById(id);
-
-/* ================= ITEM POOL ================= */
-const itemNames=[
-"Reaktör","Kristal","Drone","Motor","Çekirdek","Antimadde",
-"Void","Plazma","Zaman Tozu","Nebula Kalbi"
-];
-
-/* ================= RARITY ================= */
+const itemNames=["Reaktör","Kristal","Drone","Motor","Çekirdek","Antimadde","Void","Plazma","Zaman Tozu","Nebula Kalbi","Yıldız Parçası","Kuantum Çip","Galaksi Tozu","Asteroit Kalbi"];
 const rarities=[
-{name:'common',chance:40,multi:1},
-{name:'uncommon',chance:25,multi:1.5},
+{name:'common',chance:30,multi:1},
+{name:'uncommon',chance:20,multi:1.5},
 {name:'rare',chance:15,multi:2},
 {name:'epic',chance:10,multi:3},
-{name:'legendary',chance:6,multi:6},
-{name:'mythic',chance:3,multi:10},
-{name:'cosmic',chance:1,multi:25}
+{name:'legendary',chance:8,multi:6},
+{name:'mythic',chance:5,multi:10},
+{name:'cosmic',chance:4,multi:20},
+{name:'divine',chance:3,multi:35},
+{name:'celestial',chance:2,multi:50},
+{name:'eternal',chance:1,multi:200} // jackpot
 ];
 
+/* ================= ETERNAL EFFECT ================= */
 function rollRarity(){
-    // 5 milyon şans
-    if(Math.floor(Math.random()*5000000)===1){
-        return {name:'eternal',multi:200};
-    }
-
+    if(Math.floor(Math.random()*5000000)===1) return {name:'eternal',multi:200};
     let r=Math.random()*100,sum=0;
     for(const x of rarities){sum+=x.chance;if(r<=sum)return x;}
     return rarities[0];
 }
-
-/* ================= JACKPOT EFFECT ================= */
-function showEternalMessage(){
-    const msg=$('eternalMsg');
-    msg.classList.add('show');
-    setTimeout(()=>msg.classList.remove('show'),4000);
-}
+function showEternal(){const m=$('eternalMsg');m.classList.add('show');setTimeout(()=>m.classList.remove('show'),4000);}
 
 /* ================= POWER ================= */
 function equipped(){return inventory.filter(i=>i.equipped);}
 function getPower(){return equipped().reduce((a,b)=>a+b.power,0);}
+function rebirthCost(){return Math.floor(500*Math.pow(1.5,rebirth));}
 
 /* ================= UI ================= */
 function updateUI(){
@@ -130,145 +102,107 @@ function updateUI(){
     $('rebirth').textContent=rebirth;
     $('nebula').textContent=nebula;
     $('slots').textContent=equipped().length+" / "+maxSlots;
-
+    const need=rebirthCost(); $('rebNeed').textContent=Math.max(0,need-getPower())>0 ? (need-getPower())+" daha lazım" : "Hazır!";
     const list=$('invList'); list.innerHTML='';
     inventory.forEach((i,idx)=>{
         const d=document.createElement('div');
         d.className='item '+i.rarity+(i.equipped?' equipped':'');
-
         d.innerHTML=`<b>${i.name}</b> (${i.rarity})<br>Güç ${i.power}`;
-
         if(i.rarity!=='eternal'){
-            const sell=document.createElement('button');
-            sell.textContent='Sat';
-            sell.onclick=()=>{
-                money+=Math.floor(i.power*5);
-                inventory.splice(idx,1);
-                updateUI(); save();
-            };
+            const sell=document.createElement('button'); sell.textContent='Sat';
+            sell.onclick=()=>{money+=Math.floor(i.power*5);inventory.splice(idx,1);updateUI();save();}
             d.appendChild(sell);
         }
-
-        const eq=document.createElement('button');
-        eq.textContent=i.equipped?'Çıkar':'Tak';
-        eq.onclick=()=>{
-            if(!i.equipped && equipped().length>=maxSlots){alert("Slot dolu");return;}
-            i.equipped=!i.equipped; updateUI(); save();
-        };
-
-        d.appendChild(eq);
-        list.appendChild(d);
+        const eq=document.createElement('button'); eq.textContent=i.equipped?'Çıkar':'Tak';
+        eq.onclick=()=>{if(!i.equipped && equipped().length>=maxSlots){alert("Slot dolu");return;}i.equipped=!i.equipped;updateUI();save();}
+        d.appendChild(eq); list.appendChild(d);
     });
 }
 
 /* ================= CHEST ================= */
-function chestCost(){return Math.floor(100*Math.pow(1.25,rebirth));}
-
-function openChest(){
-    if(inventory.length>=invCap){alert("Envanter dolu");return;}
-    const cost=chestCost();
-    if(money<cost){alert("Yetmez");return;}
-    money-=cost;
-
-    const rar=rollRarity();
-    let power=Math.floor((Math.random()*15+5)*rar.multi);
-    power=Math.floor(power*Math.pow(1.2,rebirth));
-
-    if(rar.name==='eternal') showEternalMessage();
-
-    inventory.push({
-        name:itemNames[Math.floor(Math.random()*itemNames.length)],
-        rarity:rar.name,
-        power,
-        equipped:false,
-        keep: rar.name==='eternal'
-    });
-
+function chestCost(){return Math.floor(100*Math.pow(1.25,rebirth)*(1+Math.floor(chestCount/3)*0.1));}
+function openChest(auto=false){
+    if(inventory.length>=invCap){if(!auto)return;else return;}
+    const cost=chestCost(); if(!auto && money<cost){alert("Yetmez");return;} if(!auto) money-=cost; chestCount++;
+    const rar=rollRarity(); let power=Math.floor((Math.random()*15+5)*rar.multi*Math.pow(1.2,rebirth));
+    let isEternal=false;
+    if(rar.name==='eternal'){showEternal();isEternal=true;}
+    const item={name:itemNames[Math.floor(Math.random()*itemNames.length)],rarity:rar.name,power,equipped:false,keep:isEternal};
+    inventory.push(item);
+    if(isEternal && !eternalInMarket){eternalInMarket=true; renderShop();}
     updateUI(); save();
 }
 
 /* ================= AUTO EQUIP ================= */
-function autoEquip(){
-    inventory.forEach(i=>i.equipped=false);
-    inventory.sort((a,b)=>b.power-a.power)
-    .slice(0,maxSlots)
-    .forEach(i=>i.equipped=true);
-}
+function autoEquip(){inventory.forEach(i=>i.equipped=false);inventory.sort((a,b)=>b.power-a.power).slice(0,maxSlots).forEach(i=>i.equipped=true);}
 
 /* ================= SHOP ================= */
 function renderShop(){
     const div=$('shopItems'); div.innerHTML='';
+    // SLOT
+    const c1=document.createElement('div'); c1.className='shop-card';
+    if(maxSlots>=10){c1.innerHTML="Slot MAX"}else{
+        const cost=Math.floor(1*upgrades.marketScaling);
+        c1.innerHTML=`<div>+1 Slot<br>${cost} Rebirth</div>`;
+        const b=document.createElement('button'); b.textContent='Al';
+        b.onclick=()=>{if(rebirth<cost){alert("Yetmez");return;}rebirth-=cost; maxSlots++; upgrades.marketScaling+=0.5; renderShop(); updateUI(); save();}
+        c1.appendChild(b);
+    } div.appendChild(c1);
 
-    const slotCost=Math.floor(500*Math.pow(1.8,maxSlots-3));
-    const c=document.createElement('div');
-    c.className='shop-card';
-    c.innerHTML=`<div>+1 Slot<br>$${slotCost}</div>`;
-    const b=document.createElement('button');
-    b.textContent='Al';
-    b.onclick=()=>{
-        if(money<slotCost){alert("Yetmez");return;}
-        money-=slotCost; maxSlots++;
-        updateUI(); save();
-    };
-    c.appendChild(b);
-    div.appendChild(c);
+    // ENVANTER
+    const c2=document.createElement('div'); c2.className='shop-card';
+    const capCost=Math.floor(1*upgrades.marketScaling);
+    c2.innerHTML=`<div>+10 Kapasite<br>${capCost} Rebirth</div>`;
+    const b2=document.createElement('button'); b2.textContent='Al';
+    b2.onclick=()=>{if(rebirth<capCost){alert("Yetmez");return;}rebirth-=capCost; invCap+=10; upgrades.marketScaling+=0.5; updateUI(); renderShop(); save();}
+    c2.appendChild(b2); div.appendChild(c2);
+
+    // ETİRNAL MARKET ITEM
+    if(eternalInMarket){
+        const c3=document.createElement('div'); c3.className='shop-card';
+        c3.innerHTML=`<div>Jackpot Item<br>500 Rebirth</div>`;
+        const b3=document.createElement('button'); b3.textContent='Al';
+        b3.onclick=()=>{
+            if(rebirth<500){alert("Yetmez");return;}
+            if(inventory.some(i=>i.rarity==='eternal')){alert("Zaten sahip oldun");return;}
+            rebirth-=500;
+            inventory.push({name:"Eternal Jackpot",rarity:'eternal',power:1000,equipped:false,keep:true});
+            updateUI(); renderShop(); save();
+        };
+        c3.appendChild(b3); div.appendChild(c3);
+    }
 }
 
 /* ================= REBIRTH ================= */
-function rebirthCost(){return Math.floor(500*Math.pow(1.4,rebirth));}
-
 $('rebirthBtn').onclick=()=>{
-    if(getPower()<rebirthCost()){alert("Daha güçlü ol");return;}
+    if(getPower()<rebirthCost()){alert("Yetersiz");return;}
     rebirth++; nebula++;
-
     inventory=inventory.filter(i=>i.keep);
-
-    money=1000;
+    money=1000+upgrades.startMoney;
     updateUI(); save();
 };
 
 /* ================= IDLE ================= */
 setInterval(()=>{
-    money+=getPower();
+    money+=getPower()*upgrades.moneyMulti;
     updateUI();
 },1000);
 
-/* ================= SAVE LOAD ================= */
-function save(){
-    localStorage.setItem(SAVE,JSON.stringify({
-        money,rebirth,nebula,inventory,maxSlots,invCap
-    }));
-}
-function load(){
-    const d=localStorage.getItem(SAVE);
-    if(!d)return;
-    const s=JSON.parse(d);
-    money=s.money??money;
-    rebirth=s.rebirth??rebirth;
-    nebula=s.nebula??nebula;
-    inventory=s.inventory??inventory;
-    maxSlots=s.maxSlots??maxSlots;
-    invCap=s.invCap??invCap;
-}
+/* ================= AUTO CHEST ================= */
+setInterval(()=>{openChest(true);},5000); // 5 saniyede bir
+
+/* ================= SAVE/LOAD ================= */
+function save(){localStorage.setItem(SAVE,JSON.stringify({money,rebirth,nebula,inventory,maxSlots,invCap,upgrades,chestCount,eternalInMarket}));}
+function load(){const d=localStorage.getItem(SAVE);if(!d)return;const s=JSON.parse(d);money=s.money??money;rebirth=s.rebirth??rebirth;nebula=s.nebula??nebula;inventory=s.inventory??inventory;maxSlots=s.maxSlots??maxSlots;invCap=s.invCap??invCap;upgrades=s.upgrades??upgrades; chestCount=s.chestCount??0; eternalInMarket=s.eternalInMarket??false;}
 
 /* ================= TABS ================= */
-document.querySelectorAll('.tabButton').forEach(b=>{
-    b.onclick=()=>{
-        document.querySelectorAll('.tabButton').forEach(x=>x.classList.remove('active'));
-        b.classList.add('active');
-        document.querySelectorAll('#content>div').forEach(d=>d.classList.remove('active'));
-        $(b.dataset.tab).classList.add('active');
-    };
-});
+document.querySelectorAll('.tabButton').forEach(b=>{b.onclick=()=>{document.querySelectorAll('.tabButton').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('#content>div').forEach(d=>d.classList.remove('active'));$(b.dataset.tab).classList.add('active');}});
 
 /* ================= INIT ================= */
-$('chestIcon').onclick=openChest;
+$('chestIcon').onclick=()=>{openChest(false);}
 $('autoEquipBtn').onclick=()=>{autoEquip();updateUI();save();}
 $('resetBtn').onclick=()=>{localStorage.removeItem(SAVE);location.reload();}
-
-load();
-renderShop();
-updateUI();
+load(); renderShop(); updateUI();
 </script>
 </body>
 </html>
