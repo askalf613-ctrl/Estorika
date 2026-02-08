@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nebula Idle - Ultimate V11</title>
+    <title>Nebula Idle - Ultimate V12</title>
     <link href="https://fonts.googleapis.com/css2?family=Creepster&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
     <style>
         body {
@@ -191,7 +191,7 @@
         6. Boss yen, achievement tamamla, günlük ödül topla.<br><br>
         Arka planda bırak, para biriksin. Eğlen!
     </p>
-    <button onclick="document.getElementById('tutorialPanel').style.display='none'">Başla!</button>
+    <button id="startBtn">Başla!</button>
 </div>
 
 <div id="topBar">
@@ -201,14 +201,14 @@
     <div class="stats" id="equippedInfo">Takılı: Yok</div>
 
     <div id="chestContainer">
-        <div class="chest-icon" id="chestIcon" onclick="openChest()">🗝️</div>
+        <div class="chest-icon" id="chestIcon">🗝️</div>
     </div>
 
     <div style="text-align:center; margin:10px;">
-        <button onclick="toggleMusic()">🎵 Müzik</button>
-        <button onclick="doRebirth()">🔄 Rebirth</button>
-        <button onclick="resetGame()">💀 Sıfırla</button>
-        <button onclick="claimDaily()">📅 Günlük</button>
+        <button id="musicBtn">🎵 Müzik</button>
+        <button id="rebirthBtn">🔄 Rebirth</button>
+        <button id="resetBtn">💀 Sıfırla</button>
+        <button id="dailyBtn">📅 Günlük</button>
     </div>
 </div>
 
@@ -241,124 +241,179 @@
     </div>
 </div>
 
+<audio id="bgm" loop preload="auto">
+    <source src="YOU CAN ASK THE FLOWERSYOU CAN ASK THE FLOWERS (HORROR MIX)(_6TMiEoJeZ9U_).m4a" type="audio/mp4">
+</audio>
+
 <script>
-    // DATA
-    let money = 1000;
-    let inventory = [];
-    let equipped = {};
-    let nebulaPoints = 0;
-    let rebirthLevel = 0;
-    let lastSave = Date.now();
-    let musicOn = false;
+// Global State
+let state = {
+    money: 1000,
+    power: 0,
+    rebirthLevel: 0,
+    nebulaPoints: 0,
+    inventory: [],
+    equipped: {},
+    musicOn: false,
+    lastSave: Date.now()
+};
 
-    // LOAD
-    function load() {
-        const s = localStorage.getItem('nebulaSave');
-        if (s) {
-            const data = JSON.parse(s);
-            money = data.money || 1000;
-            inventory = data.inventory || [];
-            equipped = data.equipped || {};
-            nebulaPoints = data.nebula || 0;
-            rebirthLevel = data.rebirth || 0;
-            lastSave = data.time || Date.now();
-        }
-        const offline = Math.floor((Date.now() - lastSave)/1000 / 60);
-        money += offline * 10; // basit offline
+// Utility
+const $ = id => document.getElementById(id);
+const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+// Save / Load
+function saveGame() {
+    localStorage.setItem('nebulaV12', JSON.stringify(state));
+}
+
+function loadGame() {
+    const saved = localStorage.getItem('nebulaV12');
+    if (saved) {
+        Object.assign(state, JSON.parse(saved));
     }
+    // Offline progress
+    const offlineMin = Math.floor((Date.now() - state.lastSave) / 60000);
+    state.money += offlineMin * Math.floor(state.power / 5);
+}
 
-    function save() {
-        localStorage.setItem('nebulaSave', JSON.stringify({
-            money, inventory, equipped, nebula: nebulaPoints, rebirth: rebirthLevel, time: Date.now()
-        }));
-    }
-
-    // MUSIC
-    function toggleMusic() {
-        const a = document.getElementById('bgm');
-        musicOn = !musicOn;
-        if (musicOn) a.play().catch(() => alert("Müzik için ekrana dokun!"));
-        else a.pause();
-    }
-
-    // CHEST
-    function openChest() {
-        if (money < 200) return alert("Para yetmez!");
-        money -= 200;
-        const rarity = Math.random() < 0.6 ? 'common' : Math.random() < 0.85 ? 'rare' : Math.random() < 0.97 ? 'epic' : 'legendary';
-        const item = {
-            id: Date.now(),
-            name: rarity.toUpperCase() + " Item",
-            rarity,
-            power: rarity === 'common' ? rand(5,15) : rarity === 'rare' ? rand(15,30) : rarity === 'epic' ? rand(30,60) : rand(60,100),
-            level: 1
-        };
-        inventory.push(item);
-        animateChestOpen();
-        render();
-        save();
-    }
-
-    function animateChestOpen() {
-        const icon = document.getElementById('chestIcon');
-        icon.classList.add('chest-opening');
-        setTimeout(() => icon.classList.remove('chest-opening'), 1200);
-
-        // Partikül burst
-        for (let i = 0; i < 30; i++) {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            p.style.left = '50%';
-            p.style.top = '50%';
-            p.style.setProperty('--dx', (Math.random() - 0.5) * 200 + 'px');
-            p.style.setProperty('--dy', (Math.random() - 0.5) * 200 + 'px');
-            p.style.background = ['#ffd700', '#ff4500', '#ff00ff', '#00ff88'][Math.floor(Math.random()*4)];
-            document.getElementById('chestContainer').appendChild(p);
-            setTimeout(() => p.remove(), 1000);
-        }
-    }
-
-    function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-
-    // RENDER
-    function render() {
-        document.getElementById('money').textContent = money;
-        document.getElementById('power').textContent = inventory.reduce((sum, i) => sum + (i.power * i.level), 0);
-        document.getElementById('rebirthLevel').textContent = rebirthLevel;
-        document.getElementById('nebulaPoints').textContent = nebulaPoints;
-
-        let eq = "";
-        for (let slot in equipped) {
-            const id = equipped[slot];
-            const item = inventory.find(i => i.id === id);
-            if (item) eq += slot + ": " + item.name + " ";
-        }
-        document.getElementById('equippedInfo').textContent = eq || "Takılı: Yok";
-
-        const list = document.getElementById('inventoryList');
-        list.innerHTML = "";
-        inventory.forEach(item => {
-            const div = document.createElement('div');
-            div.className = `item ${item.rarity}`;
-            div.innerHTML = `<b>${item.name}</b><br>Güç: ${item.power} | Seviye: ${item.level}`;
-            const btn = document.createElement('button');
-            btn.className = 'smallBtn';
-            btn.textContent = 'Tak';
-            btn.onclick = () => { equipped[item.type || 'weapon'] = item.id; render(); save(); };
-            div.appendChild(btn);
-            list.appendChild(div);
+// Music
+function toggleMusic() {
+    const audio = $('bgm');
+    state.musicOn = !state.musicOn;
+    if (state.musicOn) {
+        audio.play().catch(() => {
+            alert("Müzik için ekrana bir kez dokun!");
         });
+    } else {
+        audio.pause();
+    }
+}
+
+// Chest Open
+function openChest() {
+    if (state.money < 100) return alert("Para yetmez!");
+    state.money -= 100;
+
+    const rarityRoll = Math.random();
+    let rarity = 'common';
+    if (rarityRoll < 0.6) rarity = 'common';
+    else if (rarityRoll < 0.85) rarity = 'rare';
+    else if (rarityRoll < 0.97) rarity = 'epic';
+    else rarity = 'legendary';
+
+    const item = {
+        id: Date.now(),
+        name: rarity.toUpperCase() + " Item",
+        rarity,
+        power: rarity === 'common' ? rand(5,15) : rarity === 'rare' ? rand(15,30) : rarity === 'epic' ? rand(30,60) : rand(60,100),
+        level: 1
+    };
+
+    state.inventory.push(item);
+    animateChest();
+    updateUI();
+    saveGame();
+}
+
+function animateChest() {
+    const icon = $('chestIcon');
+    icon.classList.add('chest-opening');
+    setTimeout(() => icon.classList.remove('chest-opening'), 1200);
+
+    // Particles
+    const container = $('chestContainer');
+    for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = '50%';
+        p.style.top = '50%';
+        p.style.setProperty('--dx', (Math.random() - 0.5) * 200 + 'px');
+        p.style.setProperty('--dy', (Math.random() - 0.5) * 200 + 'px');
+        p.style.background = ['#ffd700', '#ff4500', '#ff00ff', '#00ff88'][rand(0,3)];
+        container.appendChild(p);
+        setTimeout(() => p.remove(), 1200);
     }
 
-    // START
-    load();
-    render();
-    setInterval(save, 10000);
+    if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+}
+
+// Update UI
+function updateUI() {
+    $('money').textContent = state.money;
+    let totalPower = 0;
+    state.inventory.forEach(item => {
+        if (Object.values(state.equipped).includes(item.id)) {
+            totalPower += item.power * item.level;
+        }
+    });
+    state.power = totalPower;
+    $('power').textContent = totalPower;
+    $('rebirthLevel').textContent = state.rebirthLevel;
+    $('nebulaPoints').textContent = state.nebulaPoints;
+
+    let eqText = "Takılı: ";
+    let hasEquipped = false;
+    for (let key in state.equipped) {
+        const id = state.equipped[key];
+        const item = state.inventory.find(i => i.id === id);
+        if (item) {
+            eqText += item.name + " ";
+            hasEquipped = true;
+        }
+    }
+    $('equippedInfo').textContent = hasEquipped ? eqText : "Takılı: Yok";
+
+    // Inventory List
+    const inv = $('inventoryList');
+    inv.innerHTML = "";
+    state.inventory.forEach(item => {
+        const div = document.createElement('div');
+        div.className = `item ${item.rarity}`;
+        div.innerHTML = `<b>${item.name}</b><br>Güç: ${item.power} | Seviye: ${item.level}`;
+        const equipBtn = document.createElement('button');
+        equipBtn.className = 'smallBtn';
+        equipBtn.textContent = 'Tak';
+        equipBtn.onclick = () => {
+            state.equipped[item.rarity || 'default'] = item.id;
+            updateUI();
+            saveGame();
+        };
+        div.appendChild(equipBtn);
+        inv.appendChild(div);
+    });
+}
+
+// Tab Switching
+function switchTab(tab) {
+    document.querySelectorAll('.tabContent').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tabButton').forEach(el => el.classList.remove('active'));
+    $(tab + 'Panel').classList.add('active');
+    event.target.classList.add('active');
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+    loadGame();
+    updateUI();
+
+    $('chestIcon').addEventListener('click', openChest);
+    document.querySelectorAll('.tabButton').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+    $('musicBtn').addEventListener('click', toggleMusic);
+
+    // Auto save
+    setInterval(() => {
+        state.lastSave = Date.now();
+        saveGame();
+    }, 10000);
 
     // Tutorial auto close
     setTimeout(() => {
-        document.getElementById('tutorialPanel').style.display = 'none';
+        $('tutorialPanel').style.display = 'none';
     }, 30000);
+});
 </script>
 </body>
 </html>
