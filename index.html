@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nebula Idle - Ultimate V12</title>
+    <title>Nebula Idle - Modular V13</title>
     <link href="https://fonts.googleapis.com/css2?family=Creepster&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
     <style>
         body {
@@ -65,10 +65,6 @@
         button:hover {
             transform: scale(1.08);
             box-shadow: 0 0 30px rgba(195, 0, 255, 0.9);
-        }
-
-        .tabButton {
-            background: #2a0040;
         }
 
         .tabButton.active {
@@ -191,7 +187,7 @@
         6. Boss yen, achievement tamamla, günlük ödül topla.<br><br>
         Arka planda bırak, para biriksin. Eğlen!
     </p>
-    <button id="startBtn">Başla!</button>
+    <button onclick="document.getElementById('tutorialPanel').style.display='none'">Başla!</button>
 </div>
 
 <div id="topBar">
@@ -246,8 +242,12 @@
 </audio>
 
 <script>
-// Global State
-let state = {
+// ========================
+// MODÜLER YAPILANDIRMA
+// ========================
+
+// 1. State (tek merkezî obje)
+const gameState = {
     money: 1000,
     power: 0,
     rebirthLevel: 0,
@@ -255,53 +255,177 @@ let state = {
     inventory: [],
     equipped: {},
     musicOn: false,
-    lastSave: Date.now()
+    lastSave: Date.now(),
+    lastDailyClaim: 0,
+    dailyStreak: 0
 };
 
-// Utility
+// 2. DOM Cache & Helper
 const $ = id => document.getElementById(id);
-const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const $$ = selector => document.querySelectorAll(selector);
 
-// Save / Load
+const elements = {
+    money: $('money'),
+    power: $('power'),
+    rebirthLevel: $('rebirthLevel'),
+    nebulaPoints: $('nebulaPoints'),
+    equippedInfo: $('equippedInfo'),
+    chestIcon: $('chestIcon'),
+    inventoryList: $('inventoryList'),
+    shopList: $('shopList'),
+    rebirthShopList: $('rebirthShopList'),
+    achievementsList: $('achievementsList'),
+    bgm: $('bgm')
+};
+
+// 3. Utility Functions
+function rand(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function rollRarity() {
+    const r = Math.random();
+    if (r < 0.6) return 'common';
+    if (r < 0.85) return 'rare';
+    if (r < 0.97) return 'epic';
+    return 'legendary';
+}
+
+function calculatePower() {
+    let total = 0;
+    Object.values(gameState.equipped).forEach(id => {
+        const item = gameState.inventory.find(i => i.id === id);
+        if (item) total += item.power * item.level;
+    });
+    gameState.power = total;
+}
+
+function formatNumber(num) {
+    return num.toLocaleString('tr-TR');
+}
+
+// 4. Save / Load
 function saveGame() {
-    localStorage.setItem('nebulaV12', JSON.stringify(state));
+    gameState.lastSave = Date.now();
+    localStorage.setItem('nebulaV13', JSON.stringify(gameState));
 }
 
 function loadGame() {
-    const saved = localStorage.getItem('nebulaV12');
+    const saved = localStorage.getItem('nebulaV13');
     if (saved) {
-        Object.assign(state, JSON.parse(saved));
+        Object.assign(gameState, JSON.parse(saved));
     }
-    // Offline progress
-    const offlineMin = Math.floor((Date.now() - state.lastSave) / 60000);
-    state.money += offlineMin * Math.floor(state.power / 5);
+    // Offline progress (basit)
+    const offlineMin = Math.floor((Date.now() - gameState.lastSave) / 60000);
+    gameState.money += offlineMin * Math.floor(gameState.power / 10);
+    calculatePower();
 }
 
-// Music
-function toggleMusic() {
-    const audio = $('bgm');
-    state.musicOn = !state.musicOn;
-    if (state.musicOn) {
-        audio.play().catch(() => {
-            alert("Müzik için ekrana bir kez dokun!");
-        });
-    } else {
-        audio.pause();
-    }
+// 5. UI Update Modülleri
+function updateMoney() {
+    elements.money.textContent = formatNumber(gameState.money);
 }
 
-// Chest Open
+function updatePower() {
+    elements.power.textContent = formatNumber(gameState.power);
+}
+
+function updateRebirth() {
+    elements.rebirthLevel.textContent = gameState.rebirthLevel;
+    elements.nebulaPoints.textContent = formatNumber(gameState.nebulaPoints);
+}
+
+function updateEquipped() {
+    let text = "Takılı: ";
+    let has = false;
+    Object.entries(gameState.equipped).forEach(([slot, id]) => {
+        const item = gameState.inventory.find(i => i.id === id);
+        if (item) {
+            text += `${slot}: ${item.name} `;
+            has = true;
+        }
+    });
+    elements.equippedInfo.textContent = has ? text : "Takılı: Yok";
+}
+
+function updateInventory() {
+    const list = elements.inventoryList;
+    list.innerHTML = '';
+    gameState.inventory.forEach(item => {
+        const div = document.createElement('div');
+        div.className = `item ${item.rarity}`;
+        div.innerHTML = `<b>${item.name}</b><br>Güç: ${item.power} | Seviye: ${item.level}`;
+        const equipBtn = document.createElement('button');
+        equipBtn.className = 'smallBtn';
+        equipBtn.textContent = 'Tak';
+        equipBtn.onclick = () => {
+            gameState.equipped[item.rarity || 'default'] = item.id;
+            updateUI();
+            saveGame();
+        };
+        div.appendChild(equipBtn);
+        list.appendChild(div);
+    });
+}
+
+function updateShop() {
+    const list = elements.shopList;
+    list.innerHTML = '';
+    // Örnek mağaza item'ları (daha fazla eklenebilir)
+    const shopItems = [
+        {name: "Garantili Rare Sandık", cost: 500, action: () => buyChest(true, 'rare')},
+        {name: "Epic Booster", cost: 2000, action: () => { gameState.nebulaPoints += 20; updateUI(); saveGame(); }},
+        {name: "Para Paketi (5k)", cost: 1000, action: () => { gameState.money += 5000; updateUI(); saveGame(); }}
+    ];
+    shopItems.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `<b>${item.name}</b> - ${formatNumber(item.cost)} 💰`;
+        const btn = document.createElement('button');
+        btn.className = 'smallBtn';
+        btn.textContent = 'Satın Al';
+        btn.onclick = () => {
+            if (gameState.money >= item.cost) {
+                gameState.money -= item.cost;
+                item.action();
+                updateUI();
+                saveGame();
+            } else alert("Para yetmez!");
+        };
+        div.appendChild(btn);
+        list.appendChild(div);
+    });
+}
+
+function updateRebirthShop() {
+    // Rebirth shop burada olacak (daha sonra genişletilebilir)
+    const list = elements.rebirthShopList;
+    list.innerHTML = '<p>Rebirth puanınla kalıcı upgrade'ler yakında eklenecek!</p>';
+}
+
+function updateAchievements() {
+    const list = elements.achievementsList;
+    list.innerHTML = '<p>Başarılar yakında eklenecek!</p>';
+}
+
+function updateUI() {
+    updateMoney();
+    updatePower();
+    updateRebirth();
+    updateEquipped();
+    updateInventory();
+    updateShop();
+    updateRebirthShop();
+    updateAchievements();
+}
+
+// 6. Chest & Animasyon
 function openChest() {
-    if (state.money < 100) return alert("Para yetmez!");
-    state.money -= 100;
+    const cost = 100 + Math.floor(gameState.power / 10);
+    if (gameState.money < cost) return alert(`Para yetmez! (${cost} lazım)`);
+    gameState.money -= cost;
 
-    const rarityRoll = Math.random();
-    let rarity = 'common';
-    if (rarityRoll < 0.6) rarity = 'common';
-    else if (rarityRoll < 0.85) rarity = 'rare';
-    else if (rarityRoll < 0.97) rarity = 'epic';
-    else rarity = 'legendary';
-
+    const rarity = rollRarity();
     const item = {
         id: Date.now(),
         name: rarity.toUpperCase() + " Item",
@@ -310,18 +434,17 @@ function openChest() {
         level: 1
     };
 
-    state.inventory.push(item);
-    animateChest();
+    gameState.inventory.push(item);
+    animateChestOpen();
     updateUI();
     saveGame();
 }
 
-function animateChest() {
+function animateChestOpen() {
     const icon = $('chestIcon');
     icon.classList.add('chest-opening');
     setTimeout(() => icon.classList.remove('chest-opening'), 1200);
 
-    // Particles
     const container = $('chestContainer');
     for (let i = 0; i < 30; i++) {
         const p = document.createElement('div');
@@ -338,74 +461,45 @@ function animateChest() {
     if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
 }
 
-// Update UI
-function updateUI() {
-    $('money').textContent = state.money;
-    let totalPower = 0;
-    state.inventory.forEach(item => {
-        if (Object.values(state.equipped).includes(item.id)) {
-            totalPower += item.power * item.level;
+// 7. Event Bindings
+function bindEvents() {
+    $('chestIcon').addEventListener('click', openChest);
+    $('musicBtn').addEventListener('click', () => {
+        gameState.musicOn = !gameState.musicOn;
+        const audio = $('bgm');
+        if (gameState.musicOn) {
+            audio.play().catch(() => alert("Müzik için ekrana dokun!"));
+        } else {
+            audio.pause();
         }
     });
-    state.power = totalPower;
-    $('power').textContent = totalPower;
-    $('rebirthLevel').textContent = state.rebirthLevel;
-    $('nebulaPoints').textContent = state.nebulaPoints;
-
-    let eqText = "Takılı: ";
-    let hasEquipped = false;
-    for (let key in state.equipped) {
-        const id = state.equipped[key];
-        const item = state.inventory.find(i => i.id === id);
-        if (item) {
-            eqText += item.name + " ";
-            hasEquipped = true;
+    $('rebirthBtn').addEventListener('click', () => alert("Rebirth yakında!"));
+    $('resetBtn').addEventListener('click', () => {
+        if (confirm("Tüm ilerleme silinecek!")) {
+            localStorage.clear();
+            location.reload();
         }
-    }
-    $('equippedInfo').textContent = hasEquipped ? eqText : "Takılı: Yok";
+    });
+    $('dailyBtn').addEventListener('click', () => alert("Günlük ödül yakında!"));
 
-    // Inventory List
-    const inv = $('inventoryList');
-    inv.innerHTML = "";
-    state.inventory.forEach(item => {
-        const div = document.createElement('div');
-        div.className = `item ${item.rarity}`;
-        div.innerHTML = `<b>${item.name}</b><br>Güç: ${item.power} | Seviye: ${item.level}`;
-        const equipBtn = document.createElement('button');
-        equipBtn.className = 'smallBtn';
-        equipBtn.textContent = 'Tak';
-        equipBtn.onclick = () => {
-            state.equipped[item.rarity || 'default'] = item.id;
-            updateUI();
-            saveGame();
-        };
-        div.appendChild(equipBtn);
-        inv.appendChild(div);
+    $$('.tabButton').forEach(btn => {
+        btn.addEventListener('click', () => {
+            $$('.tabContent').forEach(p => p.classList.remove('active'));
+            $$('.tabButton').forEach(b => b.classList.remove('active'));
+            $(btn.dataset.tab + 'Panel').classList.add('active');
+            btn.classList.add('active');
+        });
     });
 }
 
-// Tab Switching
-function switchTab(tab) {
-    document.querySelectorAll('.tabContent').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.tabButton').forEach(el => el.classList.remove('active'));
-    $(tab + 'Panel').classList.add('active');
-    event.target.classList.add('active');
-}
-
-// Init
+// 8. Init
 document.addEventListener('DOMContentLoaded', () => {
     loadGame();
     updateUI();
-
-    $('chestIcon').addEventListener('click', openChest);
-    document.querySelectorAll('.tabButton').forEach(btn => {
-        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-    });
-    $('musicBtn').addEventListener('click', toggleMusic);
+    bindEvents();
 
     // Auto save
     setInterval(() => {
-        state.lastSave = Date.now();
         saveGame();
     }, 10000);
 
