@@ -1,193 +1,296 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nebula Idle - V14 Fix</title>
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Creepster', cursive;
-            background: radial-gradient(circle at 50% 50%, #0a0015 0%, #000 70%);
-            color: #d0c0ff;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        #topBar {
-            padding: 15px;
-            background: rgba(10,0,30,0.9);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 2px solid #aa00ff;
-        }
-
-        .stats {
-            font-size: 18px;
-            margin: 6px 0;
-        }
-
-        button {
-            background: linear-gradient(135deg, #6a00ff, #c300ff);
-            border: none;
-            padding: 10px 18px;
-            border-radius: 10px;
-            color: white;
-            font-weight: bold;
-            margin: 5px;
-            cursor: pointer;
-        }
-
-        .tabButton.active {
-            background: #ff00aa;
-        }
-
-        #tabs {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px;
-        }
-
-        #content > div {
-            display: none;
-        }
-
-        #content > div.active {
-            display: block;
-        }
-
-        #chestContainer {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        #chestIcon {
-            font-size: 90px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        #chestIcon:hover {
-            transform: scale(1.2);
-        }
-
-        .particle {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: burst 0.8s forwards;
-        }
-
-        @keyframes burst {
-            to { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
-        }
-
-        .item {
-            background: rgba(30,0,60,0.7);
-            border: 1px solid #6a00ff;
-            border-radius: 10px;
-            padding: 12px;
-            margin: 10px 0;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nebula Idle</title>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Creepster',cursive;background:radial-gradient(circle,#0a0015,#000);color:#d0c0ff}
+#topBar{padding:15px;background:rgba(10,0,30,.95);position:sticky;top:0;border-bottom:2px solid #aa00ff}
+button{background:linear-gradient(135deg,#6a00ff,#c300ff);border:none;padding:6px 12px;border-radius:8px;color:#fff;margin:3px;cursor:pointer}
+.tabButton.active{background:#ff00aa}
+#tabs{display:flex;justify-content:center;gap:6px;padding:10px}
+#content>div{display:none;padding:10px}
+#content>div.active{display:block}
+.item{background:rgba(30,0,60,.7);border:1px solid #6a00ff;padding:8px;border-radius:8px;margin:6px 0}
+.equipped{border:2px solid gold}
+.common{color:#ddd}.uncommon{color:#6effa3}.rare{color:#4fc3ff}.epic{color:#c77dff}.legendary{color:gold}.mythic{color:#ff4fd8}.cosmic{color:#00f7ff}
+#chestIcon{font-size:90px;text-align:center;cursor:pointer}
+.shop-card{display:flex;justify-content:space-between;align-items:center;background:rgba(20,0,40,.7);border:1px solid #9a3cff;padding:8px;border-radius:8px;margin:6px 0}
+#drop{text-align:center;height:24px;margin-top:4px}
+</style>
 </head>
 <body>
 
 <div id="topBar">
-    <div class="stats">Para: <span id="money">1000</span></div>
-    <div class="stats">Güç: <span id="power">0</span></div>
-    <div class="stats">Rebirth: <span id="rebirth">0</span> | Nebula: <span id="nebula">0</span></div>
+<div>Para: <span id="money"></span></div>
+<div>Takılı Güç: <span id="power"></span></div>
+<div>Slot: <span id="slots"></span></div>
+<div>Rebirth: <span id="rebirth"></span> | Nebula: <span id="nebula"></span></div>
 
-    <div id="chestContainer">
-        <div id="chestIcon">🗝️</div>
-    </div>
+<div id="chestIcon">🗝️</div>
+<div id="drop"></div>
 
-    <div style="text-align:center">
-        <button id="musicBtn">Müzik</button>
-        <button id="rebirthBtn">Rebirth</button>
-        <button id="resetBtn">Sıfırla</button>
-    </div>
+<div style="text-align:center">
+<button id="autoEquipBtn">Auto Equip</button>
+<button id="rebirthBtn">Rebirth</button>
+<button id="resetBtn">Reset</button>
+</div>
 </div>
 
 <div id="tabs">
-    <button class="tabButton active" data-tab="inventory">Envanter</button>
-    <button class="tabButton" data-tab="shop">Mağaza</button>
-    <button class="tabButton" data-tab="rebirthShop">Rebirth Shop</button>
+<button class="tabButton active" data-tab="inventory">Envanter</button>
+<button class="tabButton" data-tab="shop">Mağaza</button>
+<button class="tabButton" data-tab="rebirthShop">Rebirth Shop</button>
 </div>
 
 <div id="content">
-    <div id="inventory" class="active">
-        <h2>Envanter</h2>
-        <div id="invList"></div>
-    </div>
-    <div id="shop">
-        <h2>Mağaza</h2>
-        <div id="shopItems"></div>
-    </div>
-    <div id="rebirthShop">
-        <h2>Rebirth Shop</h2>
-        <p>Yakında upgrade'ler eklenecek!</p>
-    </div>
+<div id="inventory" class="active"><div id="invList"></div></div>
+<div id="shop"><div id="shopItems"></div></div>
+<div id="rebirthShop"><div id="rebirthItems"></div></div>
 </div>
 
-<audio id="bgm" loop>
-    <source src="YOU CAN ASK THE FLOWERSYOU CAN ASK THE FLOWERS (HORROR MIX)(_6TMiEoJeZ9U_).m4a" type="audio/mp4">
-</audio>
-
 <script>
-// Basit state
-let money = 1000;
-let power = 0;
-let inventory = [];
+/* ================= STATE ================= */
+let money=1000;
+let rebirth=0;
+let nebula=0;
+let inventory=[];
+let maxSlots=3;
 
-// DOM
-const $ = id => document.getElementById(id);
+let upgrades={
+    chestDiscount:0,
+    powerBonus:0,
+    moneyMulti:1,
+    autoEquipUnlock:0,
+    slotBonus:0
+};
 
-// Update UI
-function updateUI() {
-    $('money').textContent = money;
-    $('power').textContent = power;
+const SAVE_KEY="nebulaRebirthShop";
 
-    const list = $('invList');
-    list.innerHTML = '';
-    inventory.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'item';
-        div.innerHTML = `${item.name} - Güç: ${item.power}`;
-        list.appendChild(div);
+/* ================= HELPERS ================= */
+const $=id=>document.getElementById(id);
+
+/* ================= RARITY ================= */
+const rarities=[
+{name:'common',chance:40,multi:1},
+{name:'uncommon',chance:25,multi:1.4},
+{name:'rare',chance:15,multi:2},
+{name:'epic',chance:10,multi:3},
+{name:'legendary',chance:6,multi:6},
+{name:'mythic',chance:3,multi:10},
+{name:'cosmic',chance:1,multi:25}
+];
+
+function rollRarity(){
+    let r=Math.random()*100,sum=0;
+    for(const x of rarities){sum+=x.chance;if(r<=sum)return x;}
+    return rarities[0];
+}
+
+/* ================= POWER ================= */
+function equipped(){return inventory.filter(i=>i.equipped);}
+function getPower(){return equipped().reduce((a,b)=>a+b.power,0);}
+
+/* ================= UI ================= */
+function updateUI(){
+    $('money').textContent=Math.floor(money);
+    $('power').textContent=Math.floor(getPower());
+    $('rebirth').textContent=rebirth;
+    $('nebula').textContent=nebula;
+    $('slots').textContent=equipped().length+" / "+(maxSlots+upgrades.slotBonus);
+
+    const list=$('invList'); list.innerHTML='';
+    inventory.forEach((i,idx)=>{
+        const d=document.createElement('div');
+        d.className='item '+i.rarity+(i.equipped?' equipped':'');
+
+        d.innerHTML=`<b>${i.name}</b> (${i.rarity})<br>Güç ${i.power}`;
+
+        const eq=document.createElement('button');
+        eq.textContent=i.equipped?'Çıkar':'Tak';
+        eq.onclick=()=>{
+            if(!i.equipped && equipped().length>=maxSlots+upgrades.slotBonus){
+                alert("Slot dolu");return;
+            }
+            i.equipped=!i.equipped; updateUI(); save();
+        };
+
+        const sell=document.createElement('button');
+        sell.textContent='Sat';
+        sell.onclick=()=>{
+            money+=Math.floor(i.power*5);
+            inventory.splice(idx,1);
+            updateUI(); save();
+        };
+
+        d.appendChild(eq); d.appendChild(sell);
+        list.appendChild(d);
     });
 }
 
-// Sandık aç
-function openChest() {
-    if (money < 100) return alert("Para yetmez aq!");
-    money -= 100;
+/* ================= CHEST ================= */
+function openChest(){
+    const cost=Math.floor(100*(1-upgrades.chestDiscount/100));
+    if(money<cost){alert("Yetmez");return;}
+    money-=cost;
 
-    const item = {
-        name: 'Yeni Item',
-        power: Math.floor(Math.random() * 20) + 5
-    };
-    inventory.push(item);
-    power += item.power;
+    const rar=rollRarity();
+    let power=Math.floor((Math.random()*15+5)*rar.multi);
+    power=Math.floor(power*(1+upgrades.powerBonus/100));
 
-    animateChest();
-    updateUI();
+    inventory.push({
+        name:"Item",
+        rarity:rar.name,
+        power,
+        equipped:false
+    });
+
+    const drop=$('drop');
+    drop.className=rar.name;
+    drop.textContent=rar.name.toUpperCase();
+    setTimeout(()=>drop.textContent='',1200);
+
+    if(upgrades.autoEquipUnlock) autoEquip();
+
+    updateUI(); save();
 }
 
-// Efekt
-function animateChest() {
-    const icon = $('chestIcon');
-    icon.style.transform = 'scale(1.5)';
-    setTimeout(() => icon.style.transform = 'scale(1)', 300);
+/* ================= AUTO EQUIP ================= */
+function autoEquip(){
+    inventory.forEach(i=>i.equipped=false);
+    inventory.sort((a,b)=>b.power-a.power)
+    .slice(0,maxSlots+upgrades.slotBonus)
+    .forEach(i=>i.equipped=true);
+}
 
-    for (let i = 0; i < 20; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        p.style.left = '50%';
-        p.style.top = '50%
+/* ================= NORMAL SHOP ================= */
+function renderShop(){
+    const div=$('shopItems'); div.innerHTML='';
+    const cost=Math.floor(500*Math.pow(1.6,maxSlots-3));
+
+    const c=document.createElement('div');
+    c.className='shop-card';
+    c.innerHTML=`<div><b>+1 Slot</b><br>$${cost}</div>`;
+    const b=document.createElement('button');
+    b.textContent='Al';
+    b.onclick=()=>{
+        if(money<cost){alert("Yetmez");return;}
+        money-=cost; maxSlots++;
+        updateUI(); save();
+    };
+    c.appendChild(b);
+    div.appendChild(c);
+}
+
+/* ================= REBIRTH ================= */
+$('rebirthBtn').onclick=()=>{
+    if(getPower()<300){alert("300 güç lazım");return;}
+    rebirth++; nebula++;
+    money=1000; inventory=[];
+    updateUI(); save();
+};
+
+/* ================= REBIRTH SHOP (PERMANENT) ================= */
+function renderRebirthShop(){
+    const div=$('rebirthItems'); div.innerHTML='';
+
+    const list=[
+    {
+        name:'Sandık fiyatı -10%',
+        base:2,
+        get level(){return upgrades.chestDiscount/10},
+        buy(){upgrades.chestDiscount+=10;}
+    },
+    {
+        name:'+25% item gücü',
+        base:2,
+        get level(){return upgrades.powerBonus/25},
+        buy(){upgrades.powerBonus+=25;}
+    },
+    {
+        name:'Para x2',
+        base:5,
+        get level(){return Math.log2(upgrades.moneyMulti)},
+        buy(){upgrades.moneyMulti*=2;}
+    },
+    {
+        name:'Auto Equip',
+        base:3,
+        get level(){return upgrades.autoEquipUnlock},
+        buy(){upgrades.autoEquipUnlock=1;}
+    },
+    {
+        name:'+1 ekstra slot',
+        base:4,
+        get level(){return upgrades.slotBonus},
+        buy(){upgrades.slotBonus++;}
+    }
+    ];
+
+    list.forEach(u=>{
+        const cost=Math.floor(u.base*Math.pow(1.8,u.level));
+        const c=document.createElement('div');
+        c.className='shop-card';
+        c.innerHTML=`<div><b>${u.name}</b><br>Lvl ${u.level} → 🌌 ${cost}</div>`;
+        const b=document.createElement('button');
+        b.textContent='Al';
+        b.onclick=()=>{
+            if(nebula<cost){alert("Yetmez");return;}
+            nebula-=cost;
+            u.buy();
+            updateUI(); save();
+            renderRebirthShop();
+        };
+        c.appendChild(b);
+        div.appendChild(c);
+    });
+}
+
+/* ================= IDLE ================= */
+setInterval(()=>{
+    money+=getPower()*upgrades.moneyMulti;
+    updateUI();
+},1000);
+
+/* ================= SAVE LOAD ================= */
+function save(){
+    localStorage.setItem(SAVE_KEY,JSON.stringify({
+        money,rebirth,nebula,inventory,maxSlots,upgrades
+    }));
+}
+function load(){
+    const d=localStorage.getItem(SAVE_KEY);
+    if(!d)return;
+    const s=JSON.parse(d);
+    money=s.money??money;
+    rebirth=s.rebirth??rebirth;
+    nebula=s.nebula??nebula;
+    inventory=s.inventory??inventory;
+    maxSlots=s.maxSlots??maxSlots;
+    upgrades=s.upgrades??upgrades;
+}
+
+/* ================= TABS ================= */
+document.querySelectorAll('.tabButton').forEach(b=>{
+    b.onclick=()=>{
+        document.querySelectorAll('.tabButton').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        document.querySelectorAll('#content>div').forEach(d=>d.classList.remove('active'));
+        $(b.dataset.tab).classList.add('active');
+    };
+});
+
+/* ================= INIT ================= */
+$('chestIcon').onclick=openChest;
+$('autoEquipBtn').onclick=()=>{autoEquip();updateUI();save();}
+$('resetBtn').onclick=()=>{localStorage.removeItem(SAVE_KEY);location.reload();}
+
+load();
+renderShop();
+renderRebirthShop();
+updateUI();
+</script>
+</body>
+</html>
