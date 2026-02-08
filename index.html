@@ -1,218 +1,239 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nebula Idle - Rebirth Ultimate V5</title>
-<link href="https://fonts.googleapis.com/css2?family=Creepster&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
-<link rel="manifest" href="data:application/manifest+json,{
-  'name': 'Nebula Idle',
-  'short_name': 'Nebula',
-  'start_url': '.',
-  'display': 'standalone',
-  'background_color': '#0b001a',
-  'theme_color': '#ff00ff'
-}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nebula Idle - Rebirth Ultimate V6</title>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+</head>
 
 <style>
-body{
-    margin:0;
-    font-family:'Creepster', cursive;
+body {
+    margin: 0;
+    font-family: 'Creepster', cursive;
     background: linear-gradient(45deg, #0b001a, #000814, #1a0033, #330066);
     background-size: 400% 400%;
     animation: nebulaBg 25s ease infinite;
-    color:#e0e0ff;
-    overflow-x:hidden;
+    color: #e0e0ff;
+    overflow-x: hidden;
 }
 
 @keyframes nebulaBg {
-    0%,100% { background-position: 0% 50%; }
+    0%, 100% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
 }
 
-#topBar{
-    padding:20px;
-    background:rgba(20,0,40,0.95);
-    position:sticky;
-    top:0;
-    z-index:100;
+#topBar {
+    padding: 20px;
+    background: rgba(20, 0, 40, 0.95);
+    position: sticky;
+    top: 0;
+    z-index: 100;
     backdrop-filter: blur(15px);
     border-bottom: 3px solid #ff00ff;
-    box-shadow: 0 0 50px rgba(255,0,255,0.3);
+    box-shadow: 0 0 50px rgba(255, 0, 255, 0.3);
 }
 
-.stats { 
-    font-size:20px; 
-    font-weight:bold; 
-    text-shadow:0 0 15px #ff00ff; 
-    margin-bottom:12px; 
+.stats {
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow: 0 0 15px #ff00ff;
+    margin-bottom: 12px;
 }
 
-button{
-    background:linear-gradient(45deg, #8b00ff, #ff00ff);
-    border:2px solid #ff00ff;
-    padding:14px 18px;
-    border-radius:18px;
-    font-family:'Creepster', cursive;
-    font-weight:bold;
-    margin:8px 6px;
-    color:white;
-    cursor:pointer;
-    transition:all 0.4s ease;
-    box-shadow:0 0 25px rgba(139,0,255,0.7);
-    min-width:130px;
-    position:relative;
-    overflow:hidden;
+button {
+    background: linear-gradient(45deg, #8b00ff, #ff00ff);
+    border: 2px solid #ff00ff;
+    padding: 14px 18px;
+    border-radius: 18px;
+    font-family: 'Creepster', cursive;
+    font-weight: bold;
+    margin: 8px 6px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    box-shadow: 0 0 25px rgba(139, 0, 255, 0.7);
+    min-width: 130px;
+    position: relative;
+    overflow: hidden;
 }
 
 button::before {
     content: '';
     position: absolute;
-    top: 0; left: -100%;
-    width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
     transition: left 0.5s;
 }
 
-button:hover::before { left: 100%; }
-button:hover { 
-    background:linear-gradient(45deg, #ff00ff, #8b00ff);
-    box-shadow:0 0 50px #ff00ff;
-    transform:scale(1.1) rotate(3deg);
+button:hover::before {
+    left: 100%;
 }
 
-button:disabled { 
-    opacity:0.4; 
-    cursor:not-allowed; 
-    transform:none; 
-    box-shadow:none;
+button:hover {
+    background: linear-gradient(45deg, #ff00ff, #8b00ff);
+    box-shadow: 0 0 50px #ff00ff;
+    transform: scale(1.1) rotate(3deg);
 }
 
-.tabButton.active { 
-    background:linear-gradient(45deg, #ff1493, #ff69b4);
-    box-shadow:0 0 60px #ff1493; 
+button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
-#tabs { 
-    display:flex; 
-    flex-wrap:wrap; 
-    justify-content:center; 
-    gap:12px; 
-    margin:15px 0; 
+.tabButton.active {
+    background: linear-gradient(45deg, #ff1493, #ff69b4);
+    box-shadow: 0 0 60px #ff1493;
 }
 
-#content { padding:25px; min-height:100vh; }
+#tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 15px 0;
+}
 
-.tabContent { display:none; }
-.tabContent.active { display:block; }
+#content {
+    padding: 25px;
+    min-height: 100vh;
+}
+
+.tabContent {
+    display: none;
+}
+
+.tabContent.active {
+    display: block;
+}
 
 .panel {
-    max-width:700px;
-    margin:0 auto;
+    max-width: 700px;
+    margin: 0 auto;
 }
 
-.item, .shopItem, .rebirthItem, .upgradeItem {
-    background:rgba(30,0,60,0.85);
-    padding:18px;
-    border-radius:18px;
-    margin-bottom:18px;
-    border:2px solid #8b00ff;
-    box-shadow:0 0 30px rgba(139,0,255,0.5);
-    transition:all 0.4s ease;
-    position:relative;
-}
-
-.item:hover, .shopItem:hover, .rebirthItem:hover, .upgradeItem:hover { 
-    transform:scale(1.06) rotate(1deg); 
-    box-shadow:0 0 60px #ff00ff; 
-    border-color:#ff00ff;
-}
-
+.item,
+.shopItem,
+.rebirthItem,
 .achievement {
-    background:rgba(0,60,0,0.85);
-    border:2px solid #00ff88;
+    background: rgba(30, 0, 60, 0.85);
+    padding: 18px;
+    border-radius: 18px;
+    margin-bottom: 18px;
+    border: 2px solid #8b00ff;
+    box-shadow: 0 0 30px rgba(139, 0, 255, 0.5);
+    transition: all 0.4s ease;
+    position: relative;
+}
+
+.item:hover,
+.shopItem:hover,
+.rebirthItem:hover {
+    transform: scale(1.06) rotate(1deg);
+    box-shadow: 0 0 60px #ff00ff;
+    border-color: #ff00ff;
 }
 
 .achievement.achieved {
-    background:rgba(0,120,0,0.95);
-    box-shadow:0 0 40px #00ff88;
+    background: rgba(0, 120, 0, 0.95);
+    border: 2px solid #00ff88;
+    box-shadow: 0 0 40px #00ff88;
     animation: glow 2s infinite;
 }
 
-@keyframes glow { 0%,100%{box-shadow:0 0 40px #00ff88;} 50%{box-shadow:0 0 60px #00ff88, 0 0 80px #00ff88;} }
-
-.smallBtn{
-    margin:6px 6px 0 0;
-    padding:10px 14px;
-    font-size:14px;
-    border-radius:10px;
-    width:auto;
-    font-family:Arial, sans-serif;
-    background:#22d3ee;
-    border:none;
-    color:black;
-    font-weight:bold;
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 40px #00ff88; }
+    50% { box-shadow: 0 0 60px #00ff88, 0 0 80px #00ff88; }
 }
 
-.smallBtn:hover { background:#06b6d4; transform:scale(1.05); }
+.smallBtn {
+    margin: 6px 6px 0 0;
+    padding: 10px 14px;
+    font-size: 14px;
+    border-radius: 10px;
+    width: auto;
+    font-family: Arial, sans-serif;
+    background: #22d3ee;
+    border: none;
+    color: black;
+    font-weight: bold;
+}
 
-/* Rarity */
-.common  { color:#ccc;    text-shadow:0 0 8px #ccc; }
-.rare    { color:#00bfff; text-shadow:0 0 18px #00bfff; }
-.epic    { color:#c300ff; text-shadow:0 0 25px #c300ff; }
-.legendary { color:#ffea00;text-shadow:0 0 35px #ffea00; }
-.mythic  { color:#ff0000; text-shadow:0 0 50px #ff0000, 0 0 70px #ff0000; }
+.smallBtn:hover {
+    background: #06b6d4;
+    transform: scale(1.05);
+}
 
-/* Shake */
+.common { color: #ccc; text-shadow: 0 0 8px #ccc; }
+.rare { color: #00bfff; text-shadow: 0 0 18px #00bfff; }
+.epic { color: #c300ff; text-shadow: 0 0 25px #c300ff; }
+.legendary { color: #ffea00; text-shadow: 0 0 35px #ffea00; }
+.mythic { color: #ff0000; text-shadow: 0 0 50px #ff0000, 0 0 70px #ff0000; }
+
 @keyframes shake {
-    0%,100%{transform:translate(1px,1px)rotate(0deg);}
-    10%{transform:translate(-1px,-2px)rotate(-1deg);}
-    20%{transform:translate(-3px,0px)rotate(1deg);}
-    30%{transform:translate(3px,2px)rotate(0deg);}
-    40%{transform:translate(1px,-1px)rotate(1deg);}
-    50%{transform:translate(-1px,2px)rotate(-1deg);}
-    60%{transform:translate(-3px,1px)rotate(0deg);}
-    70%{transform:translate(3px,1px)rotate(-1deg);}
-    80%{transform:translate(-1px,-1px)rotate(1deg);}
-    90%{transform:translate(1px,2px)rotate(0deg);}
+    0%, 100% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
 }
 
-.shake { animation:shake 0.8s cubic-bezier(.36,.07,.19,.97) both; }
+.shake { animation: shake 0.8s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
 
-.pulse { animation:pulse 2s infinite; }
-@keyframes pulse { 0%{opacity:0.7;transform:scale(1);}50%{opacity:1;transform:scale(1.05);}100%{opacity:0.7;transform:scale(1);} }
+.pulse { animation: pulse 2s infinite; }
+@keyframes pulse { 0% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.7; transform: scale(1); } }
 
-/* Yıldızlar & Nebula */
 body::before {
-    content:"";
-    position:fixed;top:0;left:0;right:0;bottom:0;
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background-image: 
         radial-gradient(2px 2px at 20px 30px, #fff, transparent),
-        radial-gradient(3px 3px at 80px 70px, rgba(255,255,255,0.9), transparent),
+        radial-gradient(3px 3px at 80px 70px, rgba(255, 255, 255, 0.9), transparent),
         radial-gradient(1.5px 1.5px at 120px 40px, #fff, transparent),
-        radial-gradient(2px 2px at 200px 90px, rgba(139,0,255,0.6), transparent);
-    background-repeat:repeat;
-    background-size:250px 120px;
-    opacity:0.4;
-    pointer-events:none;
+        radial-gradient(2px 2px at 200px 90px, rgba(139, 0, 255, 0.6), transparent);
+    background-repeat: repeat;
+    background-size: 250px 120px;
+    opacity: 0.4;
+    pointer-events: none;
     animation: stars 60s linear infinite;
 }
-@keyframes stars { from{transform:translateX(0) translateY(0);} to{transform:translateX(-100px) translateY(20px);} }
+
+@keyframes stars { from { transform: translateX(0) translateY(0); } to { transform: translateX(-100px) translateY(20px); } }
 
 .progressBar {
-    width:100%; height:20px; background:rgba(0,0,0,0.5); border-radius:10px; overflow:hidden; margin:10px 0;
+    width: 100%;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 10px 0;
 }
-.progressFill { height:100%; background:linear-gradient(90deg, #ff00ff, #00ff88); transition:width 0.5s; border-radius:10px; }
 
-/* Rebirth Shop Optimizasyonu */
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff00ff, #00ff88);
+    transition: width 0.5s;
+    border-radius: 10px;
+}
+
 #rebirthShopList {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
-}
-
-.rebirthItem {
-    position: relative;
 }
 
 .rebirthItem p {
@@ -233,14 +254,13 @@ body::before {
     font-family: Arial, sans-serif;
 }
 
-/* Tooltip */
 .rebirthItem:hover::after {
     content: attr(data-desc);
     position: absolute;
     bottom: 100%;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0,0,0,0.8);
+    background: rgba(0, 0, 0, 0.8);
     padding: 10px;
     border-radius: 10px;
     width: 200px;
@@ -251,48 +271,27 @@ body::before {
     pointer-events: none;
 }
 
-/* Günlük Ödüller */
-#dailyRewardsPanel {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(30,0,60,0.9);
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 0 50px #ff00ff;
-    text-align: center;
-    z-index: 200;
-}
-
-#dailyRewardsPanel h2 {
-    margin-bottom: 15px;
-}
-
-#dailyRewardsPanel button {
-    width: 200px;
-}
-
-/* Tutorial */
+#dailyRewardsPanel,
 #tutorialPanel {
     display: none;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(0,0,0,0.9);
-    padding: 25px;
+    background: rgba(30, 0, 60, 0.9);
+    padding: 20px;
     border-radius: 20px;
-    box-shadow: 0 0 60px #00ff88;
-    max-width: 500px;
-    text-align: left;
+    box-shadow: 0 0 50px #ff00ff;
+    text-align: center;
     z-index: 200;
+    max-width: 400px;
 }
 
-#tutorialPanel h2 {
-    text-align: center;
-    margin-bottom: 20px;
+#tutorialPanel {
+    background: rgba(0, 0, 0, 0.9);
+    box-shadow: 0 0 60px #00ff88;
+    text-align: left;
+    max-width: 500px;
 }
 
 #tutorialPanel p {
@@ -307,267 +306,632 @@ body::before {
     margin: 20px auto 0;
     width: 150px;
 }
-
 </style>
-</head>
 
 <body>
+    <audio id="bgm" loop preload="auto">
+        <source src="YOU CAN ASK THE FLOWERSYOU CAN ASK THE FLOWERS (HORROR MIX)(_6TMiEoJeZ9U_).m4a" type="audio/mp4">
+    </audio>
+    <audio id="chestSfx" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAo" type="audio/wav">
+    </audio>
 
-<audio id="bgm" loop preload="auto">
-  <source src="YOU CAN ASK THE FLOWERSYOU CAN ASK THE FLOWERS (HORROR MIX)(_6TMiEoJeZ9U_).m4a" type="audio/mp4">
-</audio>
-<audio id="chestSfx" preload="auto">
-  <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAo" type="audio/wav">
-</audio>
+    <div id="topBar">
+        <div class="stats">💰 Para: <span id="money">1000</span></div>
+        <div class="stats">⚡ Güç: <span id="power">0</span></div>
+        <div class="stats">🌌 Rebirth Lv: <span id="rebirthLevel">0</span> | Nebula: <span id="nebulaPoints">0</span></div>
+        <div class="stats" id="equippedInfo">Takılı: Yok</div>
 
-<div id="topBar">
-    <div class="stats">💰 Para: <span id="money">0</span></div>
-    <div class="stats">⚡ Güç: <span id="power">0</span></div>
-    <div class="stats">🌌 Rebirth Lv: <span id="rebirthLevel">0</span> | Nebula: <span id="nebulaPoints">0</span></div>
-    <div class="stats" id="equippedInfo">Takılı: Yok</div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+            <button id="chestBtn1" class="pulse" onclick="buyChests(1)">🗝️ Sandık x1 (100)</button>
+            <button id="chestBtn10" class="pulse" onclick="buyChests(10)">x10 (900)</button>
+        </div>
 
-    <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
-        <button id="chestBtn1" class="pulse" onclick="buyChests(1)">🗝️ Sandık x1 (100)</button>
-        <button id="chestBtn10" class="pulse" onclick="buyChests(10)">x10 (900)</button>
+        <button onclick="toggleMusic()">🎵 Müzik</button>
+        <button onclick="doRebirth()">🔄 Rebirth</button>
+        <button onclick="resetGame()">💀 Sıfırla</button>
+        <button onclick="claimDailyReward()">📅 Günlük Ödül</button>
     </div>
 
-    <button onclick="toggleMusic()">🎵 Müzik</button>
-    <button onclick="doRebirth()">🔄 Rebirth</button>
-    <button onclick="resetGame()">💀 Sıfırla</button>
-    <button onclick="claimDailyReward()">📅 Günlük Ödül</button>
-</div>
-
-<div id="tabs">
-    <button class="tabButton active" data-tab="inventory">👹 Envanter</button>
-    <button class="tabButton" data-tab="shop">🛒 Mağaza</button>
-    <button class="tabButton" data-tab="rebirthShop">⭐ Rebirth Shop</button>
-    <button class="tabButton" data-tab="achievements">🏆 Başarılar</button>
-    <button class="tabButton" data-tab="boss">👹 Boss</button>
-</div>
-
-<div id="content">
-    <div id="inventoryPanel" class="tabContent panel active">
-        <h2>👹 Lanetli Envanter</h2>
-        <div id="inventoryList"></div>
+    <div id="tabs">
+        <button class="tabButton active" data-tab="inventory">👹 Envanter</button>
+        <button class="tabButton" data-tab="shop">🛒 Mağaza</button>
+        <button class="tabButton" data-tab="rebirthShop">⭐ Rebirth Shop</button>
+        <button class="tabButton" data-tab="achievements">🏆 Başarılar</button>
+        <button class="tabButton" data-tab="boss">👹 Boss</button>
     </div>
 
-    <div id="shopPanel" class="tabContent panel">
-        <h2>🛒 Karanlık Mağaza</h2>
-        <div id="shopList"></div>
+    <div id="content">
+        <div id="inventoryPanel" class="tabContent panel active">
+            <h2>👹 Lanetli Envanter</h2>
+            <div id="inventoryList"></div>
+        </div>
+
+        <div id="shopPanel" class="tabContent panel">
+            <h2>🛒 Karanlık Mağaza</h2>
+            <div id="shopList"></div>
+        </div>
+
+        <div id="rebirthShopPanel" class="tabContent panel">
+            <h2>⭐ Rebirth Mağazası (Nebula Puanı ile)</h2>
+            <div id="rebirthShopList"></div>
+        </div>
+
+        <div id="achievementsPanel" class="tabContent panel">
+            <h2>🏆 Başarılar</h2>
+            <div id="achievementsList"></div>
+        </div>
+
+        <div id="bossPanel" class="tabContent panel">
+            <h2>👹 Boss Savaşı</h2>
+            <div>Boss HP: <span id="bossHP">0</span> / <span id="bossMaxHP">1000</span></div>
+            <div class="progressBar"><div id="bossProgressBar" class="progressFill" style="width:0%"></div></div>
+            <div>İlerleme: <span id="bossProgress">0</span>%</div>
+            <button id="bossBtn" onclick="attackBoss()" disabled>⚔️ Saldır (Hasar: <span id="bossAttack">0</span>)</button>
+            <div id="bossReward"></div>
+        </div>
     </div>
 
-    <div id="rebirthShopPanel" class="tabContent panel">
-        <h2>⭐ Rebirth Mağazası (Nebula Puanı ile)</h2>
-        <div id="rebirthShopList"></div>
+    <!-- Tutorial Panel -->
+    <div id="tutorialPanel">
+        <h2>Hoş Geldin Nebula Idle'a!</h2>
+        <p>Bu oyun bir idle RPG, güç topla, item'lar yükselt, rebirth yap!</p>
+        <p>1. Sandık aç para ile item al (100 para).</p>
+        <p>2. Item'ları tak, güç artsın, pasif para kazan.</p>
+        <p>3. Item yükselt/sat, envanter yönet.</p>
+        <p>4. Güç topla, rebirth yap Nebula puan kazan (kalıcı boost).</p>
+        <p>5. Shop'ta para ile, Rebirth Shop'ta Nebula ile upgrade al.</p>
+        <p>6. Boss yen, achievement tamamla ödül kazan.</p>
+        <p>7. Günlük ödül al, offline para biriksin.</p>
+        <p>Eğlen, arka planda bırak çalışsın!</p>
+        <button onclick="closeTutorial()">Tamam, Oyna!</button>
     </div>
 
-    <div id="achievementsPanel" class="tabContent panel">
-        <h2>🏆 Başarılar</h2>
-        <div id="achievementsList"></div>
+    <!-- Günlük Ödül Panel -->
+    <div id="dailyRewardsPanel">
+        <h2>📅 Günlük Ödül</h2>
+        <p id="dailyMessage"></p>
+        <button onclick="closeDailyPanel()">Tamam</button>
     </div>
 
-    <div id="bossPanel" class="tabContent panel">
-        <h2>👹 Boss Savaşı</h2>
-        <div>Boss HP: <span id="bossHP">0</span> / <span id="bossMaxHP">1000</span></div>
-        <div class="progressBar"><div id="bossProgressBar" class="progressFill" style="width:0%"></div></div>
-        <div>İlerleme: <span id="bossProgress">0</span>%</div>
-        <button id="bossBtn" onclick="attackBoss()" disabled>⚔️ Saldır (Hasar: <span id="bossAttack">0</span>)</button>
-        <div id="bossReward"></div>
-    </div>
-</div>
+    <script>
+        // GLOBAL DATA
+        let money = 1000;
+        let inventory = [];
+        let equipped = {weapon: null, armor: null, boots: null, ring: null, amulet: null};
+        let nebulaPoints = 0;
+        let rebirthLevel = 0;
+        let rebirthUpgrades = {};
+        let achievements = [];
+        let musicOn = false;
+        let lastSaveTime = Date.now();
+        let boss = {hp: 1000, maxHP: 1000, progress: 0, defeated: false};
+        let gameMultipliers = {power: 1, income: 1, mythicChance: 0, bossDamage: 1, offlineMult: 1, sellMult: 1, upgradeCostReduction: 1, extraChestDrop: 0, rarityBoost: 0};
+        let autoChestTimer = 0;
+        let totalChestsOpened = 0;
+        let bossDefeatCount = 0;
+        let lastDailyClaim = 0;
+        let dailyStreak = 0;
+        let totalSoldItems = 0;
+        let totalOfflineMoney = 0;
+        let totalShopPurchases = 0;
 
-<!-- Tutorial Panel -->
-<div id="tutorialPanel">
-    <h2>Hoş Geldin Nebula Idle'a!</h2>
-    <p>Bu oyun bir idle RPG, güç topla, item'lar yükselt, rebirth yap!</p>
-    <p>1. Sandık aç para ile item al (100 para).</p>
-    <p>2. Item'ları tak, güç artsın, pasif para kazan.</p>
-    <p>3. Item yükselt/sat, envanter yönet.</p>
-    <p>4. Güç topla, rebirth yap Nebula puan kazan (kalıcı boost).</p>
-    <p>5. Shop'ta para ile, Rebirth Shop'ta Nebula ile upgrade al.</p>
-    <p>6. Boss yen, achievement tamamla ödül kazan.</p>
-    <p>7. Günlük ödül al, offline para biriksin.</p>
-    <p>Eğlen, arka planda bırak çalışsın!</p>
-    <button onclick="closeTutorial()">Tamam, Oyna!</button>
-</div>
+        // CONSTANTS
+        const types = ['weapon', 'armor', 'boots', 'ring', 'amulet'];
+        const typeNames = {weapon: 'Silah', armor: 'Zırh', boots: 'Bot', ring: 'Yüzük', amulet: 'Tılsım'};
+        const itemNames = {
+            common: {weapon:["Paslı Bıçak","Kırık Kılıç","Çürük Mızrak"], armor:["Kirli Kalkan","Yırtık Zırh"], boots:["Çamur Bot"], ring:["Taş Yüzük"], amulet:["Küçük Tılsım"]},
+            rare: {weapon:["Gölge Hançer","Kanlı Kılıç"], armor:["Demir Kalkan"], boots:["Gece Adım"], ring:["Büyü Halkası"], amulet:["Gölge Tılsım"]},
+            epic: {weapon:["Ejder Bıçağı","Cehennem Kılıcı"], armor:["Titan Kalkan"], boots:["Uçan Gölge"], ring:["Ejder Mücevheri"], amulet:["Şeytan Tılsımı"]},
+            legendary: {weapon:["Ebedi Kılıç","Yıldız Hançeri"], armor:["Abyss Kalkan"], boots:["Işık Hızı"], ring:["Nebula Mücevher"], amulet:["Kozmik Tılsım"]},
+            mythic: {weapon:["Kıyamet Kılıcı","Tanrı Hançeri"], armor:["Ölümsüz Kalkan"], boots:["Zaman Yolcusu"], ring:["Tanrı Mücevheri"], amulet:["Evren Tılsımı"]}
+        };
 
-<!-- Günlük Ödül Panel -->
-<div id="dailyRewardsPanel">
-    <h2>📅 Günlük Ödül</h2>
-    <p id="dailyMessage"></p>
-    <button onclick="closeDailyPanel()">Tamam</button>
-</div>
+        const rebirthUpgradesList = [
+            {id:1, name:"+1% Kalıcı Güç Multi", desc:"Gücünü kalıcı olarak %1 artırır (toplamda %100'e kadar).", cost:15, max:100, effect:"power", value:0.01},
+            {id:2, name:"+0.2x Pasif Gelir Hız", desc:"Pasif para kazanma hızını artırır.", cost:25, max:50, effect:"income", value:0.2},
+            {id:3, name:"+0.5% Mythic Şans", desc:"Mythic item çıkma şansını yükseltir.", cost:40, max:20, effect:"mythicChance", value:0.005},
+            {id:4, name:"Auto Sandık (5dk'da 1)", desc:"Her 5 dakikada otomatik sandık açar.", cost:100, max:1, effect:"autoChest", value:1},
+            {id:5, name:"5. Slot: Tılsım Unlock", desc:"Ekstra equip slotu açar (Tılsım).", cost:200, max:1, effect:"extraSlot", value:1},
+            {id:6, name:"Auto Upgrade (10dk'da Lv+1)", desc:"Takılı item'ları otomatik yükseltir.", cost:150, max:1, effect:"autoUpgrade", value:1},
+            {id:7, name:"+0.5x Boss Hasar Multi", desc:"Boss'a verilen hasarı artırır.", cost:30, max:30, effect:"bossDamage", value:0.5},
+            {id:8, name:"+0.1x Offline Para Multi", desc:"Offline para kazancını yükseltir.", cost:20, max:40, effect:"offlineMult", value:0.1},
+            {id:9, name:"+0.2x Satış Para Multi", desc:"Item satışından daha fazla para kazandırır.", cost:35, max:25, effect:"sellMult", value:0.2},
+            {id:10, name:"-1% Upgrade Maliyet Azalt", desc:"Item yükseltme maliyetini düşürür.", cost:50, max:15, effect:"upgradeCostReduction", value:0.01},
+            {id:11, name:"+1 Sandık Drop (x10 Alınca)", desc:"x10 sandık alınca ekstra sandık verir.", cost:80, max:10, effect:"extraChestDrop", value:1},
+            {id:12, name:"Rarity Boost (Common -> Rare %2)", desc:"Genel rarity şansını kaydırır (daha iyi item'lar).", cost:60, max:20, effect:"rarityBoost", value:0.02}
+        ];
 
-<script>
-/* GLOBAL DATA */
-let money = 1000;
-let inventory = [];
-let equipped = {weapon: null, armor: null, boots: null, ring: null, amulet: null};
-let nebulaPoints = 0;
-let rebirthLevel = 0;
-let rebirthUpgrades = {}; 
-let achievements = [];
-let musicOn = false;
-let lastSaveTime = Date.now();
-let boss = {hp: 1000, maxHP: 1000, progress: 0, defeated: false};
-let gameMultipliers = {power: 1, income: 1, mythicChance: 0, bossDamage: 1, offlineMult: 1, sellMult: 1, upgradeCostReduction: 1, extraChestDrop: 0, rarityBoost: 0};
-let autoChestTimer = 0;
-let totalChestsOpened = 0;
-let bossDefeatCount = 0;
-let lastDailyClaim = 0; // Unix timestamp
+        const shopItems = [
+            {id:1, name:"Garantili Rare x5", cost:2500, action:()=>buyChests(5, "rare")},
+            {id:2, name:"Epic Booster (+10 Nebula)", cost:5000, action:()=>{nebulaPoints+=10; totalShopPurchases++;}},
+            {id:3, name:"Hızlı Para (+10k)", cost:15000, action:()=>{money+=10000; totalShopPurchases++;}}
+        ];
 
-/* CONSTANTS */
-const types = ['weapon', 'armor', 'boots', 'ring', 'amulet'];
-const typeNames = {weapon: 'Silah', armor: 'Zırh', boots: 'Bot', ring: 'Yüzük', amulet: 'Tılsım'};
-const itemNames = {
-    common: {weapon:["Paslı Bıçak","Kırık Kılıç","Çürük Mızrak"], armor:["Kirli Kalkan","Yırtık Zırh"], boots:["Çamur Bot"], ring:["Taş Yüzük"], amulet:["Küçük Tılsım"]},
-    rare: {weapon:["Gölge Hançer","Kanlı Kılıç"], armor:["Demir Kalkan"], boots:["Gece Adım"], ring:["Büyü Halkası"], amulet:["Gölge Tılsım"]},
-    epic: {weapon:["Ejder Bıçağı","Cehennem Kılıcı"], armor:["Titan Kalkan"], boots:["Uçan Gölge"], ring:["Ejder Mücevheri"], amulet:["Şeytan Tılsımı"]},
-    legendary: {weapon:["Ebedi Kılıç","Yıldız Hançeri"], armor:["Abyss Kalkan"], boots:["Işık Hızı"], ring:["Nebula Mücevher"], amulet:["Kozmik Tılsım"]},
-    mythic: {weapon:["Kıyamet Kılıcı","Tanrı Hançeri"], armor:["Ölümsüz Kalkan"], boots:["Zaman Yolcusu"], ring:["Tanrı Mücevheri"], amulet:["Evren Tılsımı"]}
-};
+        const achievementsList = [
+            {id:1, name:"İlk Kan", desc:"1 Sandık aç", reward:{money:500}, check:()=>totalChestsOpened>=1},
+            {id:2, name:"Sandık Ustası", desc:"50 Sandık aç", reward:{nebula:5}, check:()=>totalChestsOpened>=50},
+            {id:3, name:"Legend Avcısı", desc:"10 Legendary item topla", reward:{money:5000}, check:()=>inventory.filter(i=>i.rarity==='legendary').length>=10},
+            {id:4, name:"Mythic Efendisi", desc:"1 Mythic item topla", reward:{money:25000}, check:()=>inventory.filter(i=>i.rarity==='mythic').length>=1},
+            {id:5, name:"Rebirth Başlatıcı", desc:"1 Rebirth yap", reward:{nebula:10}, check:()=>rebirthLevel>=1},
+            {id:6, name:"Rebirth Ustası", desc:"5 Rebirth yap", reward:{nebula:50}, check:()=>rebirthLevel>=5},
+            {id:7, name:"Rebirth Tanrısı", desc:"10 Rebirth yap", reward:{nebula:100}, check:()=>rebirthLevel>=10},
+            {id:8, name:"Boss Katili", desc:"1 Boss yen", reward:{money:10000}, check:()=>bossDefeatCount>=1},
+            {id:9, name:"Boss Yokedici", desc:"5 Boss yen", reward:{money:100000}, check:()=>bossDefeatCount>=5},
+            {id:10, name:"Boss İmparatoru", desc:"20 Boss yen", reward:{nebula:200}, check:()=>bossDefeatCount>=20},
+            {id:11, name:"Upgrade Manyağı", desc:"Item'ları 50 kez yükselt", reward:{money:20000}, check:()=>inventory.reduce((sum, i)=>sum + (i.level - 1), 0)>=50},
+            {id:12, name:"Satış Kralı", desc:"50 Item sat", reward:{nebula:20}, check:()=>totalSoldItems>=50},
+            {id:13, name:"Günlük Sadık", desc:"3 Gün üst üste ödül al", reward:{money:50000}, check:()=>dailyStreak>=3},
+            {id:14, name:"Offline Zengin", desc:"Offline 1M para kazan", reward:{nebula:30}, check:()=>totalOfflineMoney>=1000000},
+            {id:15, name:"Shop Harcamacısı", desc:"Mağazadan 10 alışveriş yap", reward:{money:100000}, check:()=>totalShopPurchases>=10},
+            {id:16, name:"Rebirth Shop Kralı", desc:"10 Rebirth upgrade al", reward:{nebula:100}, check:()=>Object.values(rebirthUpgrades).reduce((a,b)=>a+b,0)>=10},
+            {id:17, name:"Max Power", desc:"Güç 100k'ya ulaş", reward:{nebula:50}, check:()=>getTotalPower()>=100000},
+            {id:18, name:"Full Equip", desc:"Tüm slot'ları doldur", reward:{money:20000}, check:()=>Object.values(equipped).every(id=>id!=null)},
+            {id:19, name:"Mythic Koleksiyoncusu", desc:"5 Mythic item topla", reward:{nebula:100}, check:()=>inventory.filter(i=>i.rarity==='mythic').length>=5},
+            {id:20, name:"Idle Master", desc:"Oyun 24 saat offline kalsın", reward:{money:500000}, check:()=>getOfflineSeconds()>=86400}
+        ];
 
-/* REBIRTH UPGRADES */
-const rebirthUpgradesList = [
-    {id:1, name:"+1% Kalıcı Güç Multi", desc:"Gücünü kalıcı olarak %1 artırır (toplamda %100'e kadar).", cost:15, max:100, effect:"power", value:0.01},
-    {id:2, name:"+0.2x Pasif Gelir Hız", desc:"Pasif para kazanma hızını artırır.", cost:25, max:50, effect:"income", value:0.2},
-    {id:3, name:"+0.5% Mythic Şans", desc:"Mythic item çıkma şansını yükseltir.", cost:40, max:20, effect:"mythicChance", value:0.005},
-    {id:4, name:"Auto Sandık (5dk'da 1)", desc:"Her 5 dakikada otomatik sandık açar.", cost:100, max:1, effect:"autoChest", value:1},
-    {id:5, name:"5. Slot: Tılsım Unlock", desc:"Ekstra equip slotu açar (Tılsım).", cost:200, max:1, effect:"extraSlot", value:1},
-    {id:6, name:"Auto Upgrade (10dk'da Lv+1)", desc:"Takılı item'ları otomatik yükseltir.", cost:150, max:1, effect:"autoUpgrade", value:1},
-    {id:7, name:"+0.5x Boss Hasar Multi", desc:"Boss'a verilen hasarı artırır.", cost:30, max:30, effect:"bossDamage", value:0.5},
-    {id:8, name:"+0.1x Offline Para Multi", desc:"Offline para kazancını yükseltir.", cost:20, max:40, effect:"offlineMult", value:0.1},
-    {id:9, name:"+0.2x Satış Para Multi", desc:"Item satışından daha fazla para kazandırır.", cost:35, max:25, effect:"sellMult", value:0.2},
-    {id:10, name="-1% Upgrade Maliyet Azalt", desc:"Item yükseltme maliyetini düşürür.", cost:50, max:15, effect:"upgradeCostReduction", value:0.01},
-    {id:11, name="+1 Sandık Drop (x10 Alınca)", desc:"x10 sandık alınca ekstra sandık verir.", cost:80, max:10, effect:"extraChestDrop", value:1},
-    {id:12, name:"Rarity Boost (Common -> Rare %2)", desc:"Genel rarity şansını kaydırır (daha iyi item'lar).", cost:60, max:20, effect:"rarityBoost", value:0.02}
-];
+        // UTILITY FUNCTIONS
+        function rand(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
 
-/* SHOP ITEMS (Para ile) */
-const shopItems = [
-    {id:1, name:"Garantili Rare x5", cost:2500, action:()=>buyChests(5, "rare")},
-    {id:2, name:"Epic Booster (+10 Nebula)", cost:5000, action:()=>{nebulaPoints+=10;}},
-    {id:3, name:"Hızlı Para (+10k)", cost:15000, action:()=>{money+=10000;}}
-];
+        function rollRarity() {
+            let r = Math.random() * 100;
+            let boost = gameMultipliers.rarityBoost * 100;
+            if (r < 45 + boost) return "common";
+            if (r < 75 + boost) return "rare";
+            if (r < 92 + boost) return "epic";
+            if (r < 99 + boost) return "legendary";
+            return "mythic";
+        }
 
-/* ACHIEVEMENTS - Birsürü Eklendi! */
-const achievementsList = [
-    {id:1, name:"İlk Kan", desc:"1 Sandık aç", reward:{money:500}, check:()=>totalChestsOpened>=1},
-    {id:2, name:"Sandık Ustası", desc:"50 Sandık aç", reward:{nebula:5}, check:()=>totalChestsOpened>=50},
-    {id:3, name:"Legend Avcısı", desc:"10 Legendary item topla", reward:{money:5000}, check:()=>inventory.filter(i=>i.rarity==='legendary').length>=10},
-    {id:4, name:"Mythic Efendisi", desc:"1 Mythic item topla", reward:{money:25000}, check:()=>inventory.filter(i=>i.rarity==='mythic').length>=1},
-    {id:5, name:"Rebirth Başlatıcı", desc:"1 Rebirth yap", reward:{nebula:10}, check:()=>rebirthLevel>=1},
-    {id:6, name:"Rebirth Ustası", desc:"5 Rebirth yap", reward:{nebula:50}, check:()=>rebirthLevel>=5},
-    {id:7, name:"Rebirth Tanrısı", desc:"10 Rebirth yap", reward:{nebula:100}, check:()=>rebirthLevel>=10},
-    {id:8, name:"Boss Katili", desc:"1 Boss yen", reward:{money:10000}, check:()=>bossDefeatCount>=1},
-    {id:9, name:"Boss Yokedici", desc:"5 Boss yen", reward:{money:100000}, check:()=>bossDefeatCount>=5},
-    {id:10, name:"Boss İmparatoru", desc:"20 Boss yen", reward:{nebula:200}, check:()=>bossDefeatCount>=20},
-    {id:11, name:"Upgrade Manyağı", desc:"Item'ları 50 kez yükselt", reward:{money:20000}, check:()=>inventory.reduce((sum, i)=>sum + i.level - 1, 0)>=50},
-    {id:12, name:"Satış Kralı", desc:"50 Item sat", reward:{nebula:20}, check:()=>totalSoldItems>=50}, // Ek variable 필요
-    {id:13, name:"Günlük Sadık", desc:"3 Gün üst üste ödül al", reward:{money:50000}, check:()=>dailyStreak>=3},
-    {id:14, name:"Offline Zengin", desc:"Offline 1M para kazan", reward:{nebula:30}, check:()=>totalOfflineMoney>=1000000}, // Ek variable
-    {id:15, name:"Shop Harcamacısı", desc:"Mağazadan 10 alışveriş yap", reward:{money:100000}, check:()=>totalShopPurchases>=10}, // Ek variable
-    {id:16, name:"Rebirth Shop Kralı", desc:"10 Rebirth upgrade al", reward:{nebula:100}, check:()=>Object.values(rebirthUpgrades).reduce((a,b)=>a+b,0)>=10},
-    {id:17, name:"Max Power", desc:"Güç 100k'ya ulaş", reward:{nebula:50}, check:()=>getTotalPower()>=100000},
-    {id:18, name:"Full Equip", desc:"Tüm slot'ları doldur", reward:{money:20000}, check:()=>Object.values(equipped).every(id=>id!=null)},
-    {id:19, name:"Mythic Koleksiyoncusu", desc:"5 Mythic item topla", reward:{nebula:100}, check:()=>inventory.filter(i=>i.rarity==='mythic').length>=5},
-    {id:20, name:"Idle Master", desc:"Oyun 24 saat offline kalsın", reward:{money:500000}, check:()=>offlineSec>=86400}
-];
+        function generateItem(forcedRarity = null) {
+            const rarity = forcedRarity || rollRarity();
+            const typeIndex = rand(0, types.length - 1);
+            const type = types[typeIndex];
+            const names = itemNames[rarity][type] || itemNames[rarity].weapon;
+            const name = names[rand(0, names.length - 1)] + ` (${rarity.toUpperCase()} ${typeNames[type]})`;
 
-/* LOAD/SAVE */
-function loadGame(){
-    const save = JSON.parse(localStorage.getItem("nebulaUltimateV5"));
-    if(save){
-        money = save.money || 1000;
-        inventory = save.inventory || [];
-        equipped = save.equipped || {};
-        nebulaPoints = save.nebulaPoints || 0;
-        rebirthLevel = save.rebirthLevel || 0;
-        rebirthUpgrades = save.rebirthUpgrades || {};
-        achievements = save.achievements || [];
-        lastSaveTime = save.lastSaveTime || Date.now();
-        totalChestsOpened = save.totalChestsOpened || 0;
-        bossDefeatCount = save.bossDefeatCount || 0;
-        lastDailyClaim = save.lastDailyClaim || 0;
-        dailyStreak = save.dailyStreak || 0;
-        totalSoldItems = save.totalSoldItems || 0;
-        totalOfflineMoney = save.totalOfflineMoney || 0;
-        totalShopPurchases = save.totalShopPurchases || 0;
-        // Apply upgrades
-        applyRebirthUpgrades();
-        // Offline
-        const offlineSec = Math.floor((Date.now() - lastSaveTime)/1000);
-        const offlineMoney = Math.floor(getTotalPower() * offlineSec / 4 * gameMultipliers.income * gameMultipliers.offlineMult);
-        money += Math.max(0, offlineMoney);
-        totalOfflineMoney += offlineMoney;
-        checkAchievements();
-    } else {
-        achievements = achievementsList.map(a=>({...a, achieved:false}));
-    }
-    initBoss();
-    showTutorial();
-}
+            const powers = {common: [12, 22], rare: [28, 48], epic: [55, 85], legendary: [95, 160], mythic: [220, 380]};
+            const item = {
+                id: Date.now() + Math.random(),
+                name, rarity, type,
+                power: rand(...powers[rarity]),
+                level: 1
+            };
+            inventory.push(item);
+            totalChestsOpened++;
+            playChestSFX();
+            checkAchievements();
+            shakeUI();
+            render();
+        }
 
-function saveGame(){
-    localStorage.setItem("nebulaUltimateV5", JSON.stringify({
-        money, inventory, equipped, nebulaPoints, rebirthLevel, rebirthUpgrades, 
-        achievements, lastSaveTime: Date.now(), totalChestsOpened, bossDefeatCount,
-        lastDailyClaim, dailyStreak, totalSoldItems, totalOfflineMoney, totalShopPurchases
-    }));
-}
+        function buyChests(count, forcedRarity = null) {
+            const cost = 100 * count;
+            if (money < cost) return alert("Para yetmez!");
+            money -= cost;
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => generateItem(forcedRarity), i * 150);
+            }
+            if (count >= 10) {
+                for (let i = 0; i < gameMultipliers.extraChestDrop; i++) {
+                    setTimeout(() => generateItem(), count * 150 + i * 150);
+                }
+            }
+            saveGame();
+        }
 
-/* RARITY ROLL, RAND, GENERATE ITEM, BUY CHESTS, EQUIP, SELL, UPGRADE, POWER, PASSIVE, AUTO FEATURES, REBIRTH, BUY REBIRTH UPGRADE, BOSS, ATTACK BOSS, INIT BOSS, CHECK ACHIEVEMENTS, RENDER, RENDER LIST, RENDER INVENTORY ITEM, RENDER SHOP ITEM, RENDER REBIRTH ITEM, CREATE BTN, SHAKE UI, PLAY CHEST SFX, SWITCH TAB, RESET GAME, TOGGLE MUSIC - Önceki kodlardan kopyala, değişiklik yok. */
+        function equipItem(type, id) {
+            equipped[type] = id;
+            render();
+            saveGame();
+        }
 
-let totalSoldItems = 0;
-let totalOfflineMoney = 0;
-let totalShopPurchases = 0;
-let dailyStreak = 0;
+        function sellItem(id) {
+            const item = inventory.find(i => i.id === id);
+            if (!item) return;
+            const sellPrice = Math.floor(item.power * 12 * item.level * gameMultipliers.sellMult);
+            money += sellPrice;
+            totalSoldItems++;
+            alert(`${item.name} kurban! +${sellPrice.toLocaleString()} 💰`);
+            inventory = inventory.filter(i => i.id !== id);
+            if (equipped[item.type] === id) equipped[item.type] = null;
+            checkAchievements();
+            render();
+            saveGame();
+        }
 
-/* GÜNLÜK ÖDÜL */
-function claimDailyReward(){
-    const now = Date.now();
-    const dayMs = 86400000; // 24 saat
-    if(now - lastDailyClaim < dayMs){
-        document.getElementById("dailyMessage").innerText = "Günlük ödül zaten alındı! Yarın gel.";
-    } else {
-        const streakBonus = dailyStreak * 100;
-        const reward = 1000 + streakBonus;
-        money += reward;
-        dailyStreak++;
-        lastDailyClaim = now;
-        document.getElementById("dailyMessage").innerText = `Günlük ödül: ${reward} para! Streak: ${dailyStreak}`;
-        checkAchievements();
-        saveGame();
-    }
-    document.getElementById("dailyRewardsPanel").style.display = "block";
-}
+        function upgradeItem(id) {
+            const item = inventory.find(i => i.id === id);
+            if (!item) return;
+            let cost = Math.floor(item.level * 90 * Math.log10(item.level + 12));
+            cost = Math.floor(cost * gameMultipliers.upgradeCostReduction);
+            if (money < cost) return alert("Para yetmez!");
+            money -= cost;
+            item.level++;
+            item.power += rand(6, 15);
+            checkAchievements();
+            render();
+            saveGame();
+        }
 
-function closeDailyPanel(){
-    document.getElementById("dailyRewardsPanel").style.display = "none";
-}
+        function getTotalPower() {
+            let total = 0;
+            Object.keys(equipped).forEach(t => {
+                if (equipped[t]) {
+                    const item = inventory.find(i => i.id === equipped[t]);
+                    if (item) total += item.power * item.level;
+                }
+            });
+            return Math.floor(total * gameMultipliers.power * (1 + rebirthLevel * 0.2));
+        }
 
-/* TUTORIAL */
-function showTutorial(){
-    if(!localStorage.getItem("tutorialSeen")){
-        document.getElementById("tutorialPanel").style.display = "block";
-        localStorage.setItem("tutorialSeen", "true");
-    }
-}
+        function passiveIncome() {
+            const income = Math.floor(getTotalPower() / 4 * gameMultipliers.income);
+            if (income > 0) money += income;
+            updateBoss();
+            autoFeatures();
+            render();
+        }
 
-function closeTutorial(){
-    document.getElementById("tutorialPanel").style.display = "none";
-}
+        function autoFeatures() {
+            autoChestTimer++;
+            if (rebirthUpgrades[4] >= 1 && autoChestTimer >= 300) {
+                generateItem();
+                autoChestTimer = 0;
+            }
+            if (rebirthUpgrades[6] >= 1 && autoChestTimer % 600 === 0) {
+                Object.values(equipped).forEach(id => {
+                    if (id) upgradeItem(id);
+                });
+            }
+        }
 
-/* INIT */
-loadGame();
-render();
-setInterval(passiveIncome, 1000);
-setInterval(saveGame, 25000);
-setInterval(render, 1500);
+        function doRebirth() {
+            const powerReq = 8000 + (rebirthLevel * 3000);
+            if (getTotalPower() < powerReq || inventory.length < 10) {
+                return alert(`Rebirth Lv${rebirthLevel + 1} için ${powerReq.toLocaleString()} güç + 10 item!`);
+            }
+            if (!confirm(`Rebirth! Tüm reset, +Nebula kazanırsın.`)) return;
+            nebulaPoints += Math.floor(Math.sqrt(getTotalPower() / 50) + rebirthLevel * 8 + inventory.length);
+            rebirthLevel++;
+            resetToStart();
+            alert(`Rebirth Lv ${rebirthLevel}! Yeni güç!`);
+            checkAchievements();
+            render();
+            saveGame();
+        }
 
-// PWA
-if('serviceWorker' in navigator) navigator.serviceWorker.register('data:text/javascript;base64,...'); // Stub
-</script>
+        function resetToStart() {
+            money = 2000;
+            inventory = [];
+            equipped = {weapon: null, armor: null, boots: null, ring: null, amulet: null};
+            initBoss();
+        }
 
+        function buyRebirthUpgrade(id) {
+            const upgrade = rebirthUpgradesList.find(u => u.id === id);
+            if (!upgrade) return;
+            const owned = rebirthUpgrades[id] || 0;
+            if (owned >= upgrade.max) return alert("Max!");
+            if (nebulaPoints < upgrade.cost) return alert("Nebula yetmez!");
+            nebulaPoints -= upgrade.cost;
+            rebirthUpgrades[id] = owned + 1;
+            applyRebirthUpgrades();
+            alert(`${upgrade.name} alındı! (${owned + 1}/${upgrade.max})`);
+            checkAchievements();
+            render();
+            saveGame();
+        }
+
+        function initBoss() {
+            boss.maxHP = 1500 + (rebirthLevel * 800);
+            boss.hp = boss.maxHP;
+            boss.progress = 0;
+            boss.defeated = false;
+        }
+
+        function updateBoss() {
+            if (boss.defeated) return;
+            const damage = Math.floor(getTotalPower() / 15 * gameMultipliers.bossDamage);
+            boss.hp -= damage;
+            boss.progress = Math.max(0, 100 - (boss.hp / boss.maxHP * 100));
+            if (boss.hp <= 0) {
+                boss.defeated = true;
+                bossDefeatCount++;
+                money += 10000 + (rebirthLevel * 2000);
+                for (let i = 0; i < 8; i++) setTimeout(() => generateItem(), i * 200);
+                document.getElementById("bossReward").innerHTML = 
+                    `<h3>🎉 Boss YENİLDİ! Ödül Alındı</h3>
+                     <button onclick="initBoss(); render();" class="pulse">Yeni Boss</button>`;
+                checkAchievements();
+            }
+        }
+
+        function attackBoss() {
+            updateBoss();
+            if (navigator.vibrate) navigator.vibrate(200);
+        }
+
+        function checkAchievements() {
+            achievementsList.forEach(ach => {
+                if (!achievements.find(a => a.id === ach.id) && ach.check()) {
+                    const a = {...ach, achieved: true};
+                    achievements.push(a);
+                    if (a.reward.money) money += a.reward.money;
+                    if (a.reward.nebula) nebulaPoints += a.reward.nebula;
+                    alert(`🏆 ${a.name} ! +${a.reward.money || a.reward.nebula} ödül`);
+                    saveGame();
+                }
+            });
+        }
+
+        function render() {
+            document.getElementById("money").textContent = money.toLocaleString('tr-TR');
+            document.getElementById("power").textContent = getTotalPower().toLocaleString('tr-TR');
+            document.getElementById("rebirthLevel").textContent = rebirthLevel;
+            document.getElementById("nebulaPoints").textContent = nebulaPoints.toLocaleString('tr-TR');
+
+            let eqText = "";
+            types.forEach(t => {
+                if (equipped[t]) {
+                    const item = inventory.find(i => i.id === equipped[t]);
+                    if (item) eqText += `${typeNames[t]}: ${item.name.slice(0, 20)} Lv${item.level} | `;
+                }
+            });
+            document.getElementById("equippedInfo").innerHTML = eqText || "Takılı: Yok";
+
+            // Render inventory
+            const invList = document.getElementById("inventoryList");
+            invList.innerHTML = "";
+            inventory.forEach(item => {
+                const div = document.createElement("div");
+                div.className = `item ${item.rarity}`;
+                div.innerHTML = `
+                    <b>${item.name}</b> <span style="float:right;color:#ffaa00">G: ${item.power} Lv: ${item.level}</span><br>
+                    <small>${typeNames[item.type]}</small>
+                `;
+                const eqBtn = document.createElement("button");
+                eqBtn.className = "smallBtn";
+                eqBtn.innerText = `🧙 ${typeNames[item.type]} Tak`;
+                eqBtn.onclick = () => equipItem(item.type, item.id);
+
+                let upCost = Math.floor(item.level * 90 * Math.log10(item.level + 12) * gameMultipliers.upgradeCostReduction);
+                const upBtn = document.createElement("button");
+                upBtn.className = "smallBtn";
+                upBtn.innerText = `⬆️ Yükselt (${upCost})`;
+                upBtn.onclick = () => upgradeItem(item.id);
+
+                const sellBtn = document.createElement("button");
+                sellBtn.className = "smallBtn";
+                sellBtn.innerText = `💀 Sat (+${Math.floor(item.power * 12 * item.level * gameMultipliers.sellMult).toLocaleString()})`;
+                sellBtn.onclick = () => sellItem(item.id);
+
+                div.append(eqBtn, upBtn, sellBtn);
+                invList.appendChild(div);
+            });
+
+            // Render shop
+            const shopList = document.getElementById("shopList");
+            shopList.innerHTML = "";
+            shopItems.forEach(sItem => {
+                const div = document.createElement("div");
+                div.className = "shopItem";
+                div.innerHTML = `<b>${sItem.name}</b> - <span style="color:#ffaa00">${sItem.cost.toLocaleString('tr-TR')} 💰</span>`;
+                const btn = document.createElement("button");
+                btn.className = "smallBtn";
+                btn.innerText = "Satın Al";
+                btn.onclick = () => {
+                    if (money >= sItem.cost) {
+                        money -= sItem.cost;
+                        sItem.action();
+                        totalShopPurchases++;
+                        checkAchievements();
+                        render();
+                        saveGame();
+                    } else alert("Para yetmez!");
+                };
+                div.appendChild(btn);
+                shopList.appendChild(div);
+            });
+
+            // Render rebirth shop
+            const rebirthList = document.getElementById("rebirthShopList");
+            rebirthList.innerHTML = "";
+            rebirthUpgradesList.forEach(u => {
+                const owned = rebirthUpgrades[u.id] || 0;
+                const div = document.createElement("div");
+                div.className = "rebirthItem";
+                div.setAttribute("data-desc", u.desc);
+                div.innerHTML = `
+                    <b>${u.name}</b><br>
+                    <p>${u.desc}</p>
+                    <span style="color:#00ff88">Sahip: ${owned}/${u.max}</span><br>
+                    <small>Maliyet: ${u.cost} 🌌</small>
+                    <div class="progressBar">
+                        <div class="progressFill" style="width: ${owned / u.max * 100}%;"></div>
+                    </div>
+                `;
+                const btn = document.createElement("button");
+                btn.className = "smallBtn";
+                btn.innerText = owned < u.max ? "Al" : "Max!";
+                btn.disabled = owned >= u.max;
+                btn.onclick = () => buyRebirthUpgrade(u.id);
+                div.appendChild(btn);
+                rebirthList.appendChild(div);
+            });
+
+            // Render achievements
+            const achList = document.getElementById("achievementsList");
+            achList.innerHTML = "";
+            achievementsList.forEach(ach => {
+                const achieved = achievements.find(a => a.id === ach.id);
+                const div = document.createElement("div");
+                div.className = `achievement ${achieved ? 'achieved' : ''}`;
+                div.innerHTML = `<b>${ach.name}</b> ${achieved ? '✅' : '❌'}<br><small>${ach.desc}</small>`;
+                achList.appendChild(div);
+            });
+
+            // Render boss
+            if (!boss.defeated) {
+                document.getElementById("bossHP").textContent = Math.max(0, Math.floor(boss.hp)).toLocaleString('tr-TR');
+                document.getElementById("bossMaxHP").textContent = boss.maxHP.toLocaleString('tr-TR');
+                document.getElementById("bossProgress").textContent = boss.progress.toFixed(1);
+                document.getElementById("bossProgressBar").style.width = boss.progress + "%";
+                const canAttack = getTotalPower() >= 50;
+                const attackDmg = Math.floor(getTotalPower() / 15 * gameMultipliers.bossDamage);
+                document.getElementById("bossBtn").disabled = !canAttack;
+                document.getElementById("bossAttack").textContent = attackDmg.toLocaleString('tr-TR');
+            }
+
+            document.getElementById("chestBtn1").innerText = `🗝️ Sandık x1 (100)`;
+            document.getElementById("chestBtn10").innerText = `x10 (900)`;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tabContent').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tabButton').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName + 'Panel').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function applyRebirthUpgrades() {
+            gameMultipliers = {power: 1, income: 1, mythicChance: 0, bossDamage: 1, offlineMult: 1, sellMult: 1, upgradeCostReduction: 1, extraChestDrop: 0, rarityBoost: 0};
+            rebirthUpgradesList.forEach(u => {
+                const owned = rebirthUpgrades[u.id] || 0;
+                if (u.effect === "power") gameMultipliers.power += u.value * owned;
+                if (u.effect === "income") gameMultipliers.income += u.value * owned;
+                if (u.effect === "mythicChance") gameMultipliers.mythicChance += u.value * owned;
+                if (u.effect === "bossDamage") gameMultipliers.bossDamage += u.value * owned;
+                if (u.effect === "offlineMult") gameMultipliers.offlineMult += u.value * owned;
+                if (u.effect === "sellMult") gameMultipliers.sellMult += u.value * owned;
+                if (u.effect === "upgradeCostReduction") gameMultipliers.upgradeCostReduction -= u.value * owned;
+                if (u.effect === "extraChestDrop") gameMultipliers.extraChestDrop += u.value * owned;
+                if (u.effect === "rarityBoost") gameMultipliers.rarityBoost += u.value * owned;
+            });
+            if (rebirthUpgrades[5] >= 1 && !types.includes('amulet')) types.push('amulet');
+        }
+
+        function loadGame() {
+            const save = JSON.parse(localStorage.getItem("nebulaUltimateV6") || '{}');
+            money = save.money || 1000;
+            inventory = save.inventory || [];
+            equipped = save.equipped || {};
+            nebulaPoints = save.nebulaPoints || 0;
+            rebirthLevel = save.rebirthLevel || 0;
+            rebirthUpgrades = save.rebirthUpgrades || {};
+            achievements = save.achievements || [];
+            lastSaveTime = save.lastSaveTime || Date.now();
+            totalChestsOpened = save.totalChestsOpened || 0;
+            bossDefeatCount = save.bossDefeatCount || 0;
+            lastDailyClaim = save.lastDailyClaim || 0;
+            dailyStreak = save.dailyStreak || 0;
+            totalSoldItems = save.totalSoldItems || 0;
+            totalOfflineMoney = save.totalOfflineMoney || 0;
+            totalShopPurchases = save.totalShopPurchases || 0;
+            applyRebirthUpgrades();
+
+            const offlineSec = Math.floor((Date.now() - lastSaveTime) / 1000);
+            const offlineMoney = Math.floor(getTotalPower() * offlineSec / 4 * gameMultipliers.income * gameMultipliers.offlineMult);
+            money += Math.max(0, offlineMoney);
+            totalOfflineMoney += offlineMoney;
+            checkAchievements();
+
+            if (!achievements.length) achievements = achievementsList.map(a => ({...a, achieved: false}));
+            initBoss();
+            if (!localStorage.getItem("tutorialSeen")) showTutorial();
+        }
+
+        function saveGame() {
+            localStorage.setItem("nebulaUltimateV6", JSON.stringify({
+                money, inventory, equipped, nebulaPoints, rebirthLevel, rebirthUpgrades, 
+                achievements, lastSaveTime: Date.now(), totalChestsOpened, bossDefeatCount,
+                lastDailyClaim, dailyStreak, totalSoldItems, totalOfflineMoney, totalShopPurchases
+            }));
+        }
+
+        function shakeUI() {
+            document.body.classList.add("shake");
+            setTimeout(() => document.body.classList.remove("shake"), 800);
+        }
+
+        function playChestSFX() {
+            const sfx = document.getElementById("chestSfx");
+            sfx.currentTime = 0;
+            sfx.play().catch(() => {});
+        }
+
+        function getOfflineSeconds() {
+            return Math.floor((Date.now() - lastSaveTime) / 1000);
+        }
+
+        // EVENT LISTENERS
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.tabButton').forEach(btn => {
+                btn.onclick = (e) => switchTab(e.target.dataset.tab);
+            });
+            loadGame();
+            render();
+        });
+
+        // DAILY REWARD
+        function claimDailyReward() {
+            const now = Date.now();
+            const dayMs = 86400000;
+            if (now - lastDailyClaim < dayMs) {
+                document.getElementById("dailyMessage").innerText = "Günlük ödül zaten alındı! Yarın gel.";
+            } else {
+                const streakBonus = dailyStreak * 100;
+                const reward = 1000 + streakBonus;
+                money += reward;
+                dailyStreak = (now - lastDailyClaim > dayMs * 2) ? 1 : dailyStreak + 1;
+                lastDailyClaim = now;
+                document.getElementById("dailyMessage").innerText = `Günlük ödül: ${reward} para! Streak: ${dailyStreak}`;
+                checkAchievements();
+                saveGame();
+            }
+            document.getElementById("dailyRewardsPanel").style.display = "block";
+        }
+
+        function closeDailyPanel() {
+            document.getElementById("dailyRewardsPanel").style.display = "none";
+        }
+
+        function showTutorial() {
+            document.getElementById("tutorialPanel").style.display = "block";
+            localStorage.setItem("tutorialSeen", "true");
+        }
+
+        function closeTutorial() {
+            document.getElementById("tutorialPanel").style.display = "none";
+        }
+
+        function toggleMusic() {
+            const audio = document.getElementById("bgm");
+            musicOn = !musicOn;
+            if (musicOn) {
+                audio.play().then(() => console.log("Müzik açıldı!")).catch(e => {
+                    console.log("Müzik hatası:", e);
+                    alert("Mobil'de müzik için dokun! (User interaction gerekli)");
+                });
+            } else {
+                audio.pause();
+            }
+        }
+
+        function resetGame() {
+            if (confirm("TÜM VERİLER SİLİNECEK! Emin?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // INIT INTERVALS
+        setInterval(passiveIncome, 1000);
+        setInterval(saveGame, 25000);
+        setInterval(render, 1500);
+    </script>
 </body>
 </html>
