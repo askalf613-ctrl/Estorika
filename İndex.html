@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nebula Idle - Full System</title>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Creepster',cursive;background:radial-gradient(circle,#0a0015,#000);color:#d0c0ff}
+#topBar{padding:15px;background:rgba(10,0,30,.95);position:sticky;top:0;border-bottom:2px solid #aa00ff}
+button{background:linear-gradient(135deg,#6a00ff,#c300ff);border:none;padding:6px 12px;border-radius:8px;color:#fff;margin:3px;cursor:pointer}
+.tabButton.active{background:#ff00aa}
+#tabs{display:flex;justify-content:center;gap:6px;padding:10px}
+#content>div{display:none;padding:10px}
+#content>div.active{display:block}
+.item{background:rgba(30,0,60,.7);border:1px solid #6a00ff;padding:8px;border-radius:8px;margin:6px 0}
+.equipped{border:2px solid gold}
+.common{color:#ddd}.uncommon{color:#6effa3}.rare{color:#4fc3ff}.epic{color:#c77dff}.legendary{color:gold}.mythic{color:#ff4fd8}.cosmic{color:#00f7ff}.divine{color:#ff9900}.celestial{color:#00ffff}.eternal{color:#ffffff;text-shadow:0 0 10px #fff,0 0 25px #00f7ff}.special{color:#ff0000;text-shadow:0 0 10px #ff5555}.ultra{color:#ff9900;text-shadow:0 0 10px #ffcc00}
+#chestIcon{font-size:90px;text-align:center;cursor:pointer}
+.shop-card{display:flex;justify-content:space-between;align-items:center;background:rgba(20,0,40,.7);border:1px solid #9a3cff;padding:8px;border-radius:8px;margin:6px 0}
+#eternalMsg{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:center;font-size:40px;color:white;opacity:0;pointer-events:none;transition:.5s;z-index:999}
+#eternalMsg.show{opacity:1}
+#achievements{background:rgba(50,0,50,.7);padding:8px;border-radius:8px;margin:10px 0;}
+.achieved{color:gold;}
+</style>
+</head>
+<body>
+
+<div id="eternalMsg">Bunu nasıl çıkardın aq!</div>
+
+<div id="topBar">
+<div>Para: <span id="money"></span></div>
+<div>Takılı Güç: <span id="power"></span></div>
+<div>Slot: <span id="slots"></span></div>
+<div>Rebirth: <span id="rebirth"></span> | Nebula: <span id="nebula"></span></div>
+<div>Rebirth için gereken güç: <span id="rebNeed"></span></div>
+
+<div id="chestIcon">🗝️</div>
+
+<div style="text-align:center">
+<button id="autoEquipBtn">Auto Equip</button>
+<button id="rebirthBtn">Rebirth</button>
+<button id="resetBtn">Reset</button>
+</div>
+</div>
+
+<div id="tabs">
+<button class="tabButton active" data-tab="inventory">Envanter</button>
+<button class="tabButton" data-tab="shop">Mağaza</button>
+<button class="tabButton" data-tab="ach">Achievements</button>
+</div>
+
+<div id="content">
+<div id="inventory" class="active"><div id="invList"></div></div>
+<div id="shop"><div id="shopItems"></div></div>
+<div id="ach"><div id="achievements"></div></div>
+</div>
+
+<script>
+/* ================= STATE ================= */
+let money=1000;
+let rebirth=0;
+let nebula=0;
+let inventory=[];
+let maxSlots=3;
+let invCap=40;
+let chestCount=0;
+let upgrades={chestDiscount:0,moneyMulti:1,startMoney:0,marketScaling:1};
+let eternalInMarket=false;
+let specialInMarket=false;
+let ultraInMarket=false;
+const SAVE="nebulaFullSystem";
+
+/* ================= HELPERS ================= */
+const $=id=>document.getElementById(id);
+const itemNames=["Reaktör","Kristal","Drone","Motor","Çekirdek","Antimadde","Void","Plazma","Zaman Tozu","Nebula Kalbi","Yıldız Parçası","Kuantum Çip","Galaksi Tozu","Asteroit Kalbi","Siyah Madde","Enerji Hücresi","Antimadde Çekirdeği","Kozmik Kalkan","Warp Motor","Süpernova Parçası","Galaksi Kristali","Kuantum Madde","Astral Çekirdek","Nebula Kristali","Paralel Enerji"];
+//25 item
+
+const rarities=[
+{name:'common',chance:30,multi:1},
+{name:'uncommon',chance:20,multi:1.5},
+{name:'rare',chance:15,multi:2},
+{name:'epic',chance:10,multi:3},
+{name:'legendary',chance:8,multi:6},
+{name:'mythic',chance:5,multi:10},
+{name:'cosmic',chance:4,multi:20},
+{name:'divine',chance:3,multi:35},
+{name:'celestial',chance:2,multi:50},
+{name:'eternal',chance:0}
+];
+
+const specialItem={name:"Omega Core",rarity:"special",power:1500,keep:true};
+const ultraItem={name:"Quantum Relic",rarity:"ultra",power:800,keep:true};
+
+/* ================= ETERNAL EFFECT ================= */
+function rollRarity(){
+    const r=Math.random();
+    if(r<=1/5000000) return {name:'Eternal Jackpot',rarity:'eternal',power:1200,multi:200};
+    if(r<=1/1000000) return specialItem;
+    if(r<=0.001) return ultraItem;
+    let p=Math.random()*100,sum=0;
+    for(const x of rarities){sum+=x.chance;if(p<=sum)return {name:itemNames[Math.floor(Math.random()*itemNames.length)],rarity:x.name,power:Math.floor(Math.random()*20)+5};}
+    return {name:itemNames[Math.floor(Math.random()*itemNames.length)],rarity:'common',power:5};
+}
+function showEternal(){const m=$('eternalMsg');m.textContent="Bunu nasıl çıkardın aq!";m.classList.add('show');setTimeout(()=>m.classList.remove('show'),4000);}
+
+/* ================= POWER ================= */
+function equipped(){return inventory.filter(i=>i.equipped);}
+function getPower(){return equipped().reduce((a,b)=>a+b.power,0);}
+function rebirthCost(){return Math.floor(500*Math.pow(1.5,rebirth));}
+
+/* ================= UI ================= */
+function updateUI(){
+    $('money').textContent=Math.floor(money);
+    $('power').textContent=Math.floor(getPower());
+    $('rebirth').textContent=rebirth;
+    $('nebula').textContent=nebula;
+    $('slots').textContent=equipped().length+" / "+maxSlots;
+    const need=rebirthCost(); $('rebNeed').textContent=Math.max(0,need-getPower())>0 ? (need-getPower())+" daha lazım" : "Hazır!";
+    const list=$('invList'); list.innerHTML='';
+    inventory.forEach((i,idx)=>{
+        const d=document.createElement('div');
+        d.className='item '+i.rarity+(i.equipped?' equipped':'');
+        d.innerHTML=`<b>${i.name}</b> (${i.rarity})<br>Güç ${i.power}`;
+        if(i.rarity!=='eternal' && i.rarity!=='special' && i.rarity!=='ultra'){
+            const sell=document.createElement('button'); sell.textContent='Sat';
+            sell.onclick=()=>{money+=Math.floor(i.power*5);inventory.splice(idx,1);updateUI();save();checkAchievements();}
+            d.appendChild(sell);
+        }
+        const eq=document.createElement('button'); eq.textContent=i.equipped?'Çıkar':'Tak';
+        eq.onclick=()=>{if(!i.equipped && equipped().length>=maxSlots){alert("Slot dolu");return;}i.equipped=!i.equipped;updateUI();save();checkAchievements();}
+        d.appendChild(eq); list.appendChild(d);
+    });
+    renderAchievements();
+}
+
+/* ================= CHEST ================= */
+function chestCost(){return Math.floor(100*Math.pow(1.25,rebirth)*(1+Math.floor(chestCount/3)*0.1));}
+function openChest(auto=false){
+    if(inventory.length>=invCap) return;
+    if(!auto && money<chestCost()) return;
+    if(!auto) money-=chestCost();
+    chestCount++;
+    const item=rollRarity();
+    if(item.rarity==='eternal') showEternal();
+    if(item===specialItem) alert("Special Item Omega Core çıktı!");
+    if(item===ultraItem) alert("Ultra Item Quantum Relic çıktı!");
+    inventory.push({...item,equipped:false,keep:item.rarity==='eternal'||item.rarity==='special'||item.rarity==='ultra'});
+    if(item.rarity==='eternal' && !eternalInMarket) eternalInMarket=true;
+    if(item===specialItem && !specialInMarket) specialInMarket=true;
+    if(item===ultraItem && !ultraInMarket) ultraInMarket=true;
+    updateUI(); save();
+}
+
+/* ================= AUTO EQUIP ================= */
+function autoEquip(){inventory.forEach(i=>i.equipped=false);inventory.sort((a,b)=>b.power-a.power).slice(0,maxSlots).forEach(i=>i.equipped=true);}
+
+/* ================= SHOP ================= */
+function renderShop(){
+    const div=$('shopItems'); div.innerHTML='';
+    // SLOT
+    const c1=document.createElement('div'); c1.className='shop-card';
+    if(maxSlots>=10){c1.innerHTML="Slot MAX"}else{
+        const cost=Math.floor(1*upgrades.marketScaling);
+        c1.innerHTML=`<div>+1 Slot<br>${cost} Rebirth</div>`;
+        const b=document.createElement('button'); b.textContent='Al';
+        b.onclick=()=>{if(rebirth<cost){alert("Yetmez");return;}rebirth-=cost; maxSlots++; upgrades.marketScaling+=0.5; renderShop(); updateUI(); save();}
+        c1.appendChild(b);
+    } div.appendChild(c1);
+
+    // ENVANTER
+    const c2=document.createElement('div'); c2.className='shop-card';
+    const capCost=Math.floor(1*upgrades.marketScaling);
+    c2.innerHTML=`<div>+10 Kapasite<br>${capCost} Rebirth</div>`;
+    const b2=document.createElement('button'); b2.textContent='Al';
+    b2.onclick=()=>{if(rebirth<capCost){alert("Yetmez");return;}rebirth-=capCost; invCap+=10; upgrades.marketScaling+=0.5; updateUI(); renderShop(); save();}
+    c2.appendChild(b2); div.appendChild(c2);
+
+    // ETERNAL MARKET
+    if(eternalInMarket){
+        const c3=document.createElement('div'); c3.className='shop-card';
+        c3.innerHTML=`<div>Eternal Jackpot<br>500 Rebirth</div>`;
+        const b3=document.createElement('button'); b3.textContent='Al';
+        b3.onclick=()=>{
+            if(rebirth<500){alert("Yetmez");return;}
+            if(inventory.some(i=>i.rarity==='eternal')){alert("Zaten aldın");return;}
+            rebirth-=500;
+            inventory.push({name:"Eternal Jackpot",rarity:'eternal',power:1200,equipped:false,keep:true});
+            updateUI(); renderShop(); save(); checkAchievements();
+        };
+        c3.appendChild(b3); div.appendChild(c3);
+    }
+}
+
+/* ================= REBIRTH ================= */
+$('rebirthBtn').onclick=()=>{
+    if(getPower()<rebirthCost()){alert("Yetersiz");return;}
+    rebirth++; nebula++;
+    inventory=inventory.filter(i=>i.keep);
+    money=1000+upgrades.startMoney;
+    updateUI(); save();
+};
+
+/* ================= IDLE ================= */
+setInterval(()=>{
+    money+=getPower()*upgrades.moneyMulti;
+    updateUI();
+},1000);
+
+/* ================= AUTO CHEST ================= */
+setInterval(()=>{
+    if(money>=chestCost()) openChest(true);
+},5000);
+
+/* ================= SAVE/LOAD ================= */
+function save(){localStorage.setItem(SAVE,JSON.stringify({money,rebirth,nebula,inventory,maxSlots,invCap,upgrades,chestCount,eternalInMarket,specialInMarket,ultraInMarket}));}
+function load(){const d=localStorage.getItem(SAVE);if(!d)return;const s=JSON.parse(d);money=s.money??money;rebirth=s.rebirth??rebirth;nebula=s.nebula??nebula;inventory=s.inventory??inventory;maxSlots=s.maxSlots??maxSlots;invCap=s.invCap??invCap;upgrades=s.upgrades??upgrades; chestCount=s.chestCount??0; eternalInMarket=s.eternalInMarket??false; specialInMarket=s.specialInMarket??false; ultraInMarket=s.ultraInMarket??false;}
+
+/* ================= TABS ================= */
+document.querySelectorAll('.tabButton').forEach(b=>{b.onclick=()=>{document.querySelectorAll('.tabButton').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('#content>div').forEach(d=>d.classList.remove('active'));$(b.dataset.tab).classList.add('active');}});
+
+/* ================= ACHIEVEMENTS ================= */
+const achievements=[
+{name:"İlk Eşya",desc:"İlk itemi al",check:()=>inventory.length>=1,done:false,reward:()=>money+=100},
+{name:"5 Eşya",desc:"5 item topla",check:()=>inventory.length>=5,done:false,reward:()=>money+=500},
+{name:"10 Eşya",desc:"10 item topla",check:()=>inventory.length>=10,done:false,reward:()=>money+=1000},
+{name:"Rebirth 1",desc:"İlk rebirthi yap",check:()=>rebirth>=1,done:false,reward:()=>money+=1000},
+{name:"Rebirth 5",desc:"5 rebirth",check:()=>rebirth>=5,done:false,reward:()=>money+=5000},
+{name:"Eternal Jackpot",desc:"Eternal Jackpot al",check:()=>inventory.some(i=>i.rarity==='eternal'),done:false,reward:()=>maxSlots++}
+];
+
+function checkAchievements(){
+    achievements.forEach(a=>{
+        if(!a.done && a.check()){a.done=true;a.reward();alert("Achievement kazandın: "+a.name);updateUI();}
+    });
+}
+
+function renderAchievements(){
+    const div=$('achievements'); div.innerHTML='';
+    achievements.forEach(a=>{
+        const d=document.createElement('div');
+        d.className=a.done?'achieved':'';
+        d.textContent=a.name+": "+a.desc;
+        div.appendChild(d);
+    });
+}
+
+/* ================= INIT ================= */
+$('chestIcon').onclick=()=>{openChest(false);}
+$('autoEquipBtn').onclick=()=>{autoEquip();updateUI();save();}
+$('resetBtn').onclick=()=>{localStorage.removeItem(SAVE);location.reload();}
+load(); renderShop(); updateUI(); checkAchievements();
+</script>
+</body>
+</html>
