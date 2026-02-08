@@ -16,12 +16,34 @@ button{background:linear-gradient(135deg,#6a00ff,#c300ff);border:none;padding:6p
 .item{background:rgba(30,0,60,.7);border:1px solid #6a00ff;padding:8px;border-radius:8px;margin:6px 0}
 .equipped{border:2px solid gold}
 .common{color:#ddd}.uncommon{color:#6effa3}.rare{color:#4fc3ff}.epic{color:#c77dff}.legendary{color:gold}.mythic{color:#ff4fd8}.cosmic{color:#00f7ff}
-.eternal{color:#ffffff;text-shadow:0 0 10px #fff,0 0 20px #00f7ff}
+.eternal{color:#ffffff;text-shadow:0 0 10px #fff,0 0 25px #00f7ff}
+
 #chestIcon{font-size:90px;text-align:center;cursor:pointer}
+
 .shop-card{display:flex;justify-content:space-between;align-items:center;background:rgba(20,0,40,.7);border:1px solid #9a3cff;padding:8px;border-radius:8px;margin:6px 0}
+
+/* JACKPOT YAZISI */
+#eternalMsg{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.85);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:40px;
+    color:white;
+    text-align:center;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .5s;
+    z-index:9999;
+}
+#eternalMsg.show{opacity:1;}
 </style>
 </head>
 <body>
+
+<div id="eternalMsg">OYUN YAPIMCISI TAKTİRLERİNİ SUNAR</div>
 
 <div id="topBar">
 <div>Para: <span id="money"></span></div>
@@ -41,13 +63,11 @@ button{background:linear-gradient(135deg,#6a00ff,#c300ff);border:none;padding:6p
 <div id="tabs">
 <button class="tabButton active" data-tab="inventory">Envanter</button>
 <button class="tabButton" data-tab="shop">Mağaza</button>
-<button class="tabButton" data-tab="ach">Başarılar</button>
 </div>
 
 <div id="content">
 <div id="inventory" class="active"><div id="invList"></div></div>
 <div id="shop"><div id="shopItems"></div></div>
-<div id="ach"><div id="achList"></div></div>
 </div>
 
 <script>
@@ -59,16 +79,15 @@ let inventory=[];
 let maxSlots=3;
 let invCap=40;
 
-const SAVE="nebulaBig";
+const SAVE="nebulaJackpot";
 
 /* ================= HELPERS ================= */
 const $=id=>document.getElementById(id);
 
 /* ================= ITEM POOL ================= */
 const itemNames=[
-"Reaktör","Kristal","Drone","Motor","Çekirdek","Yıldız Haritası","Antimadde",
-"Void Parçası","Enerji Hücresi","Nano Çip","Galaktik Dişli","Plazma",
-"Singularity","Zaman Tozu","Nebula Kalbi"
+"Reaktör","Kristal","Drone","Motor","Çekirdek","Antimadde",
+"Void","Plazma","Zaman Tozu","Nebula Kalbi"
 ];
 
 /* ================= RARITY ================= */
@@ -83,7 +102,7 @@ const rarities=[
 ];
 
 function rollRarity(){
-    // ETERNAL check (5 milyon)
+    // 5 milyon şans
     if(Math.floor(Math.random()*5000000)===1){
         return {name:'eternal',multi:200};
     }
@@ -91,6 +110,13 @@ function rollRarity(){
     let r=Math.random()*100,sum=0;
     for(const x of rarities){sum+=x.chance;if(r<=sum)return x;}
     return rarities[0];
+}
+
+/* ================= JACKPOT EFFECT ================= */
+function showEternalMessage(){
+    const msg=$('eternalMsg');
+    msg.classList.add('show');
+    setTimeout(()=>msg.classList.remove('show'),4000);
 }
 
 /* ================= POWER ================= */
@@ -133,14 +159,10 @@ function updateUI(){
         d.appendChild(eq);
         list.appendChild(d);
     });
-
-    renderAch();
 }
 
 /* ================= CHEST ================= */
-function chestCost(){
-    return Math.floor(100*Math.pow(1.25,rebirth));
-}
+function chestCost(){return Math.floor(100*Math.pow(1.25,rebirth));}
 
 function openChest(){
     if(inventory.length>=invCap){alert("Envanter dolu");return;}
@@ -150,9 +172,9 @@ function openChest(){
 
     const rar=rollRarity();
     let power=Math.floor((Math.random()*15+5)*rar.multi);
-
-    // rebirth bonus
     power=Math.floor(power*Math.pow(1.2,rebirth));
+
+    if(rar.name==='eternal') showEternalMessage();
 
     inventory.push({
         name:itemNames[Math.floor(Math.random()*itemNames.length)],
@@ -190,57 +212,20 @@ function renderShop(){
     };
     c.appendChild(b);
     div.appendChild(c);
-
-    const capCost=1000;
-    const c2=document.createElement('div');
-    c2.className='shop-card';
-    c2.innerHTML=`<div>+10 Envanter<br>$${capCost}</div>`;
-    const b2=document.createElement('button');
-    b2.textContent='Al';
-    b2.onclick=()=>{
-        if(money<capCost){alert("Yetmez");return;}
-        money-=capCost; invCap+=10;
-        updateUI(); save();
-    };
-    c2.appendChild(b2);
-    div.appendChild(c2);
 }
 
 /* ================= REBIRTH ================= */
-function rebirthCost(){
-    return Math.floor(500*Math.pow(1.4,rebirth));
-}
+function rebirthCost(){return Math.floor(500*Math.pow(1.4,rebirth));}
 
 $('rebirthBtn').onclick=()=>{
     if(getPower()<rebirthCost()){alert("Daha güçlü ol");return;}
+    rebirth++; nebula++;
 
-    rebirth++;
-    nebula++;
-
-    // eternal itemleri koru
     inventory=inventory.filter(i=>i.keep);
 
     money=1000;
     updateUI(); save();
 };
-
-/* ================= ACHIEVEMENTS ================= */
-const ach=[
-{t:"İlk rebirth",c:()=>rebirth>=1},
-{t:"10 rebirth",c:()=>rebirth>=10},
-{t:"Eternal bul",c:()=>inventory.some(i=>i.rarity==='eternal')},
-{t:"1M para",c:()=>money>=1e6}
-];
-
-function renderAch(){
-    const div=$('achList'); div.innerHTML='';
-    ach.forEach(a=>{
-        const d=document.createElement('div');
-        d.className='item';
-        d.textContent=(a.c()?"✅ ":"⬜ ")+a.t;
-        div.appendChild(d);
-    });
-}
 
 /* ================= IDLE ================= */
 setInterval(()=>{
