@@ -3,373 +3,362 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nebula Idle - Ultimate V10</title>
+    <title>Nebula Idle - Ultimate V11</title>
     <link href="https://fonts.googleapis.com/css2?family=Creepster&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Creepster', cursive;
+            background: radial-gradient(circle at 50% 50%, #0a0015 0%, #000000 70%);
+            color: #d0c0ff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><circle cx="10" cy="10" r="1" fill="%23ffffff" opacity="0.3"/><circle cx="50" cy="30" r="1.5" fill="%23ffffff" opacity="0.2"/><circle cx="80" cy="70" r="1" fill="%23ffffff" opacity="0.25"/></svg>') repeat;
+            opacity: 0.12;
+            pointer-events: none;
+            animation: slowDrift 120s linear infinite;
+        }
+
+        @keyframes slowDrift {
+            from { background-position: 0 0; }
+            to { background-position: 100px 100px; }
+        }
+
+        #topBar {
+            padding: 15px;
+            background: rgba(10, 0, 30, 0.85);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid #aa00ff;
+            box-shadow: 0 4px 20px rgba(170, 0, 255, 0.3);
+        }
+
+        .stats {
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 0 12px #aa00ff;
+            margin: 8px 0;
+        }
+
+        button {
+            background: linear-gradient(135deg, #6a00ff, #c300ff);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            margin: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(106, 0, 255, 0.6);
+        }
+
+        button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 30px rgba(195, 0, 255, 0.9);
+        }
+
+        .tabButton {
+            background: #2a0040;
+        }
+
+        .tabButton.active {
+            background: linear-gradient(135deg, #c300ff, #ff00aa);
+            box-shadow: 0 0 25px #ff00aa;
+        }
+
+        #tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        #content {
+            padding: 20px;
+        }
+
+        .panel {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .item {
+            background: rgba(20, 0, 50, 0.7);
+            border: 1px solid #6a00ff;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 10px 0;
+            box-shadow: 0 0 15px rgba(106, 0, 255, 0.4);
+        }
+
+        .smallBtn {
+            background: #00d4ff;
+            color: black;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin: 4px;
+            cursor: pointer;
+        }
+
+        #chestContainer {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .chest-icon {
+            font-size: 80px;
+            cursor: pointer;
+            transition: all 0.4s;
+            filter: drop-shadow(0 0 15px #ffd700);
+        }
+
+        .chest-icon:hover {
+            transform: scale(1.15) rotate(10deg);
+            filter: drop-shadow(0 0 30px #ff4500);
+        }
+
+        .chest-opening {
+            animation: chestEpicOpen 1.2s ease-out;
+        }
+
+        @keyframes chestEpicOpen {
+            0% { transform: scale(1) rotateY(0deg); }
+            40% { transform: scale(1.4) rotateY(180deg); filter: brightness(2) drop-shadow(0 0 60px #ff00ff); }
+            70% { transform: scale(1.6) rotateY(360deg); filter: brightness(3) drop-shadow(0 0 100px #00ff88); }
+            100% { transform: scale(1) rotateY(720deg); filter: brightness(1); }
+        }
+
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #ffd700;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: burst 0.9s ease-out forwards;
+        }
+
+        @keyframes burst {
+            0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+        }
+
+        #tutorialPanel {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            color: white;
+            padding: 30px;
+            overflow-y: auto;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        #tutorialPanel button {
+            margin-top: 30px;
+            padding: 15px 40px;
+            font-size: 20px;
+        }
+    </style>
 </head>
-
-<style>
-body {
-    margin: 0;
-    font-family: 'Creepster', cursive;
-    background: linear-gradient(45deg, #0b001a, #000814, #1a0033, #330066);
-    background-size: 400% 400%;
-    animation: nebulaBg 25s ease infinite;
-    color: #e0e0ff;
-    overflow-x: hidden;
-}
-
-@keyframes nebulaBg {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-}
-
-#topBar {
-    padding: 20px;
-    background: rgba(20, 0, 40, 0.95);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(15px);
-    border-bottom: 3px solid #ff00ff;
-    box-shadow: 0 0 50px rgba(255, 0, 255, 0.3);
-}
-
-.stats {
-    font-size: 20px;
-    font-weight: bold;
-    text-shadow: 0 0 15px #ff00ff;
-    margin-bottom: 12px;
-}
-
-button {
-    background: linear-gradient(45deg, #8b00ff, #ff00ff);
-    border: 2px solid #ff00ff;
-    padding: 14px 18px;
-    border-radius: 18px;
-    font-family: 'Creepster', cursive;
-    font-weight: bold;
-    margin: 8px 6px;
-    color: white;
-    cursor: pointer;
-    transition: all 0.4s ease;
-    box-shadow: 0 0 25px rgba(139, 0, 255, 0.7);
-    min-width: 130px;
-    position: relative;
-    overflow: hidden;
-}
-
-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    transition: left 0.5s;
-}
-
-button:hover::before {
-    left: 100%;
-}
-
-button:hover {
-    background: linear-gradient(45deg, #ff00ff, #8b00ff);
-    box-shadow: 0 0 50px #ff00ff;
-    transform: scale(1.1) rotate(3deg);
-}
-
-button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-.tabButton.active {
-    background: linear-gradient(45deg, #ff1493, #ff69b4);
-    box-shadow: 0 0 60px #ff1493;
-}
-
-#tabs {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-    margin: 15px 0;
-}
-
-#content {
-    padding: 25px;
-    min-height: 100vh;
-}
-
-.tabContent {
-    display: none;
-}
-
-.tabContent.active {
-    display: block;
-}
-
-.panel {
-    max-width: 700px;
-    margin: 0 auto;
-}
-
-.item, .shopItem, .rebirthItem, .achievement {
-    background: rgba(30, 0, 60, 0.85);
-    padding: 18px;
-    border-radius: 18px;
-    margin-bottom: 18px;
-    border: 2px solid #8b00ff;
-    box-shadow: 0 0 30px rgba(139, 0, 255, 0.5);
-    transition: all 0.4s ease;
-    position: relative;
-}
-
-.item:hover, .shopItem:hover, .rebirthItem:hover {
-    transform: scale(1.06) rotate(1deg);
-    box-shadow: 0 0 60px #ff00ff;
-    border-color: #ff00ff;
-}
-
-.achievement.achieved {
-    background: rgba(0, 120, 0, 0.95);
-    border: 2px solid #00ff88;
-    box-shadow: 0 0 40px #00ff88;
-    animation: glow 2s infinite;
-}
-
-@keyframes glow {
-    0%, 100% { box-shadow: 0 0 40px #00ff88; }
-    50% { box-shadow: 0 0 60px #00ff88, 0 0 80px #00ff88; }
-}
-
-.smallBtn {
-    margin: 6px 6px 0 0;
-    padding: 10px 14px;
-    font-size: 14px;
-    border-radius: 10px;
-    width: auto;
-    font-family: Arial, sans-serif;
-    background: #22d3ee;
-    border: none;
-    color: black;
-    font-weight: bold;
-}
-
-.smallBtn:hover {
-    background: #06b6d4;
-    transform: scale(1.05);
-}
-
-.common { color: #ccc; text-shadow: 0 0 8px #ccc; }
-.rare { color: #00bfff; text-shadow: 0 0 18px #00bfff; }
-.epic { color: #c300ff; text-shadow: 0 0 25px #c300ff; }
-.legendary { color: #ffea00; text-shadow: 0 0 35px #ffea00; }
-.mythic { color: #ff0000; text-shadow: 0 0 50px #ff0000, 0 0 70px #ff0000; }
-
-@keyframes shake {
-    0%, 100% { transform: translate(1px, 1px) rotate(0deg); }
-    10% { transform: translate(-1px, -2px) rotate(-1deg); }
-    20% { transform: translate(-3px, 0px) rotate(1deg); }
-    30% { transform: translate(3px, 2px) rotate(0deg); }
-    40% { transform: translate(1px, -1px) rotate(1deg); }
-    50% { transform: translate(-1px, 2px) rotate(-1deg); }
-    60% { transform: translate(-3px, 1px) rotate(0deg); }
-    70% { transform: translate(3px, 1px) rotate(-1deg); }
-    80% { transform: translate(-1px, -1px) rotate(1deg); }
-    90% { transform: translate(1px, 2px) rotate(0deg); }
-}
-
-.shake { animation: shake 0.8s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
-
-.pulse { animation: pulse 2s infinite; }
-@keyframes pulse { 0% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.7; transform: scale(1); } }
-
-body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-        radial-gradient(2px 2px at 20px 30px, #fff, transparent),
-        radial-gradient(3px 3px at 80px 70px, rgba(255, 255, 255, 0.9), transparent),
-        radial-gradient(1.5px 1.5px at 120px 40px, #fff, transparent),
-        radial-gradient(2px 2px at 200px 90px, rgba(139, 0, 255, 0.6), transparent);
-    background-repeat: repeat;
-    background-size: 250px 120px;
-    opacity: 0.4;
-    pointer-events: none;
-    animation: stars 60s linear infinite;
-}
-
-@keyframes stars { from { transform: translateX(0) translateY(0); } to { transform: translateX(-100px) translateY(20px); } }
-
-.progressBar {
-    width: 100%;
-    height: 20px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 10px;
-    overflow: hidden;
-    margin: 10px 0;
-}
-
-.progressFill {
-    height: 100%;
-    background: linear-gradient(90deg, #ff00ff, #00ff88);
-    transition: width 0.5s;
-    border-radius: 10px;
-}
-
-#rebirthShopList {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-}
-
-.rebirthItem p {
-    font-size: 14px;
-    font-family: Arial, sans-serif;
-    margin: 10px 0;
-    color: #d1d5db;
-}
-
-.rebirthItem .progressBar {
-    height: 10px;
-    margin: 5px 0;
-}
-
-.rebirthItem button {
-    width: 100%;
-    margin-top: 10px;
-    font-family: Arial, sans-serif;
-}
-
-.rebirthItem:hover::after {
-    content: attr(data-desc);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    padding: 10px;
-    border-radius: 10px;
-    width: 200px;
-    font-size: 12px;
-    color: white;
-    text-align: center;
-    z-index: 10;
-    pointer-events: none;
-}
-
-#dailyRewardsPanel, #tutorialPanel {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(30, 0, 60, 0.9);
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 0 50px #ff00ff;
-    text-align: center;
-    z-index: 200;
-    max-width: 400px;
-}
-
-#tutorialPanel {
-    background: rgba(0, 0, 0, 0.9);
-    box-shadow: 0 0 60px #00ff88;
-    text-align: left;
-    max-width: 500px;
-}
-
-#tutorialPanel p {
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
-    margin-bottom: 15px;
-}
-
-#tutorialPanel button {
-    display: block;
-    margin: 20px auto 0;
-    width: 150px;
-}
-
-/* Sandık Görsel Efektleri - Max Görsel */
-#chestContainer {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin: 10px 0;
-    position: relative;
-}
-
-.chestBtn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 50px;
-    transition: all 0.3s;
-    position: relative;
-    padding: 10px;
-    width: 80px;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 15px;
-    box-shadow: 0 0 20px rgba(139, 0, 255, 0.5);
-}
-
-.chestBtn:hover {
-    transform: scale(1.15) rotate(5deg);
-    box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
-}
-
-.chestBtn.chest-opening {
-    animation: chestOpenEpic 1s ease-in-out;
-}
-
-@keyframes chestOpenEpic {
-    0% { transform: scale(1) rotateY(0deg); box-shadow: 0 0 20px rgba(139, 0, 255, 0.5); }
-    25% { transform: scale(1.3) rotateY(90deg); box-shadow: 0 0 60px #ffd700; background: radial-gradient(circle, #ffd700, #ff4500); }
-    50% { transform: scale(1.5) rotateY(180deg); box-shadow: 0 0 100px #ff00ff, inset 0 0 50px #fff; }
-    75% { transform: scale(1.3) rotateY(270deg); box-shadow: 0 0 80px #00ff88; }
-    100% { transform: scale(1) rotateY(360deg); box-shadow: 0 0 20px rgba(139, 0, 255, 0.5); }
-}
-
-@keyframes particleBurst {
-    0% { opacity: 1; transform: scale(0) rotate(0deg) translate(0, 0); }
-    100% { opacity: 0; transform: scale(5) rotate(720deg) translate(var(--dx), var(--dy)); }
-}
-
-.chestParticle {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: radial-gradient(circle, #ffd700, #ff4500);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 101;
-    animation: particleBurst 1s ease-out forwards;
-}
-
-.chestNormal { color: #8b4513; text-shadow: 0 0 10px #8b4513; }
-.chestRare { color: #00bfff; text-shadow: 0 0 20px #00bfff; }
-.chestLegendary { color: #ffd700; text-shadow: 0 0 30px #ffd700; }
-.chestMythic { color: #ff0000; text-shadow: 0 0 40px #ff0000, 0 0 60px #ff0000; }
-</style>
-
 <body>
-    <audio id="bgm" loop preload="auto">
-        <source src="YOU CAN ASK THE FLOWERSYOU CAN ASK THE FLOWERS (HORROR MIX)(_6TMiEoJeZ9U_).m4a" type="audio/mp4">
-    </audio>
-    <audio id="chestSfx" preload="auto">
-        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBji
+
+<div id="tutorialPanel">
+    <h2>Hoş Geldin Nebula'ya!</h2>
+    <p style="font-family: Arial; max-width: 600px; line-height: 1.6;">
+        Bu idle oyun, güç topla, item yükselt, rebirth yapıp sonsuza kadar ilerle!<br><br>
+        1. Ortadaki büyük sandığa tıkla (para harca item çıkar).<br>
+        2. Çıkan item'ları tak, güç artsın → pasif para gelsin.<br>
+        3. Item'ları yükselt veya sat.<br>
+        4. Güç biriktir, rebirth yap → Nebula puanı kazan (kalıcı güç artışı).<br>
+        5. Rebirth Shop'ta Nebula ile kalıcı upgrade al.<br>
+        6. Boss yen, achievement tamamla, günlük ödül topla.<br><br>
+        Arka planda bırak, para biriksin. Eğlen!
+    </p>
+    <button onclick="document.getElementById('tutorialPanel').style.display='none'">Başla!</button>
+</div>
+
+<div id="topBar">
+    <div class="stats">💰 Para: <span id="money">1000</span></div>
+    <div class="stats">⚡ Güç: <span id="power">0</span></div>
+    <div class="stats">🌌 Rebirth: <span id="rebirthLevel">0</span> | Nebula: <span id="nebulaPoints">0</span></div>
+    <div class="stats" id="equippedInfo">Takılı: Yok</div>
+
+    <div id="chestContainer">
+        <div class="chest-icon" id="chestIcon" onclick="openChest()">🗝️</div>
+    </div>
+
+    <div style="text-align:center; margin:10px;">
+        <button onclick="toggleMusic()">🎵 Müzik</button>
+        <button onclick="doRebirth()">🔄 Rebirth</button>
+        <button onclick="resetGame()">💀 Sıfırla</button>
+        <button onclick="claimDaily()">📅 Günlük</button>
+    </div>
+</div>
+
+<div id="tabs">
+    <button class="tabButton active" data-tab="inventory">Envanter</button>
+    <button class="tabButton" data-tab="shop">Mağaza</button>
+    <button class="tabButton" data-tab="rebirthShop">Rebirth Shop</button>
+    <button class="tabButton" data-tab="achievements">Başarılar</button>
+</div>
+
+<div id="content">
+    <div id="inventoryPanel" class="tabContent panel active">
+        <h2>Envanter</h2>
+        <div id="inventoryList"></div>
+    </div>
+
+    <div id="shopPanel" class="tabContent panel">
+        <h2>Mağaza</h2>
+        <div id="shopList"></div>
+    </div>
+
+    <div id="rebirthShopPanel" class="tabContent panel">
+        <h2>Rebirth Shop</h2>
+        <div id="rebirthShopList"></div>
+    </div>
+
+    <div id="achievementsPanel" class="tabContent panel">
+        <h2>Başarılar</h2>
+        <div id="achievementsList"></div>
+    </div>
+</div>
+
+<script>
+    // DATA
+    let money = 1000;
+    let inventory = [];
+    let equipped = {};
+    let nebulaPoints = 0;
+    let rebirthLevel = 0;
+    let lastSave = Date.now();
+    let musicOn = false;
+
+    // LOAD
+    function load() {
+        const s = localStorage.getItem('nebulaSave');
+        if (s) {
+            const data = JSON.parse(s);
+            money = data.money || 1000;
+            inventory = data.inventory || [];
+            equipped = data.equipped || {};
+            nebulaPoints = data.nebula || 0;
+            rebirthLevel = data.rebirth || 0;
+            lastSave = data.time || Date.now();
+        }
+        const offline = Math.floor((Date.now() - lastSave)/1000 / 60);
+        money += offline * 10; // basit offline
+    }
+
+    function save() {
+        localStorage.setItem('nebulaSave', JSON.stringify({
+            money, inventory, equipped, nebula: nebulaPoints, rebirth: rebirthLevel, time: Date.now()
+        }));
+    }
+
+    // MUSIC
+    function toggleMusic() {
+        const a = document.getElementById('bgm');
+        musicOn = !musicOn;
+        if (musicOn) a.play().catch(() => alert("Müzik için ekrana dokun!"));
+        else a.pause();
+    }
+
+    // CHEST
+    function openChest() {
+        if (money < 200) return alert("Para yetmez!");
+        money -= 200;
+        const rarity = Math.random() < 0.6 ? 'common' : Math.random() < 0.85 ? 'rare' : Math.random() < 0.97 ? 'epic' : 'legendary';
+        const item = {
+            id: Date.now(),
+            name: rarity.toUpperCase() + " Item",
+            rarity,
+            power: rarity === 'common' ? rand(5,15) : rarity === 'rare' ? rand(15,30) : rarity === 'epic' ? rand(30,60) : rand(60,100),
+            level: 1
+        };
+        inventory.push(item);
+        animateChestOpen();
+        render();
+        save();
+    }
+
+    function animateChestOpen() {
+        const icon = document.getElementById('chestIcon');
+        icon.classList.add('chest-opening');
+        setTimeout(() => icon.classList.remove('chest-opening'), 1200);
+
+        // Partikül burst
+        for (let i = 0; i < 30; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = '50%';
+            p.style.top = '50%';
+            p.style.setProperty('--dx', (Math.random() - 0.5) * 200 + 'px');
+            p.style.setProperty('--dy', (Math.random() - 0.5) * 200 + 'px');
+            p.style.background = ['#ffd700', '#ff4500', '#ff00ff', '#00ff88'][Math.floor(Math.random()*4)];
+            document.getElementById('chestContainer').appendChild(p);
+            setTimeout(() => p.remove(), 1000);
+        }
+    }
+
+    function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+    // RENDER
+    function render() {
+        document.getElementById('money').textContent = money;
+        document.getElementById('power').textContent = inventory.reduce((sum, i) => sum + (i.power * i.level), 0);
+        document.getElementById('rebirthLevel').textContent = rebirthLevel;
+        document.getElementById('nebulaPoints').textContent = nebulaPoints;
+
+        let eq = "";
+        for (let slot in equipped) {
+            const id = equipped[slot];
+            const item = inventory.find(i => i.id === id);
+            if (item) eq += slot + ": " + item.name + " ";
+        }
+        document.getElementById('equippedInfo').textContent = eq || "Takılı: Yok";
+
+        const list = document.getElementById('inventoryList');
+        list.innerHTML = "";
+        inventory.forEach(item => {
+            const div = document.createElement('div');
+            div.className = `item ${item.rarity}`;
+            div.innerHTML = `<b>${item.name}</b><br>Güç: ${item.power} | Seviye: ${item.level}`;
+            const btn = document.createElement('button');
+            btn.className = 'smallBtn';
+            btn.textContent = 'Tak';
+            btn.onclick = () => { equipped[item.type || 'weapon'] = item.id; render(); save(); };
+            div.appendChild(btn);
+            list.appendChild(div);
+        });
+    }
+
+    // START
+    load();
+    render();
+    setInterval(save, 10000);
+
+    // Tutorial auto close
+    setTimeout(() => {
+        document.getElementById('tutorialPanel').style.display = 'none';
+    }, 30000);
+</script>
+</body>
+</html>
