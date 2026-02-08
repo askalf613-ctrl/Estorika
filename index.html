@@ -3,109 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nebula Idle - Modular V13</title>
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <title>Nebula Idle - V14 Fix</title>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
             font-family: 'Creepster', cursive;
-            background: radial-gradient(circle at 50% 50%, #0a0015 0%, #000000 70%);
+            background: radial-gradient(circle at 50% 50%, #0a0015 0%, #000 70%);
             color: #d0c0ff;
             min-height: 100vh;
             overflow-x: hidden;
-            position: relative;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><circle cx="10" cy="10" r="1" fill="%23ffffff" opacity="0.3"/><circle cx="50" cy="30" r="1.5" fill="%23ffffff" opacity="0.2"/><circle cx="80" cy="70" r="1" fill="%23ffffff" opacity="0.25"/></svg>') repeat;
-            opacity: 0.12;
-            pointer-events: none;
-            animation: slowDrift 120s linear infinite;
-        }
-
-        @keyframes slowDrift {
-            from { background-position: 0 0; }
-            to { background-position: 100px 100px; }
         }
 
         #topBar {
             padding: 15px;
-            background: rgba(10, 0, 30, 0.85);
+            background: rgba(10,0,30,0.9);
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(12px);
             border-bottom: 2px solid #aa00ff;
-            box-shadow: 0 4px 20px rgba(170, 0, 255, 0.3);
         }
 
         .stats {
             font-size: 18px;
-            font-weight: bold;
-            text-shadow: 0 0 12px #aa00ff;
-            margin: 8px 0;
+            margin: 6px 0;
         }
 
         button {
             background: linear-gradient(135deg, #6a00ff, #c300ff);
             border: none;
-            padding: 12px 20px;
-            border-radius: 12px;
+            padding: 10px 18px;
+            border-radius: 10px;
             color: white;
             font-weight: bold;
-            margin: 6px;
+            margin: 5px;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 0 15px rgba(106, 0, 255, 0.6);
-        }
-
-        button:hover {
-            transform: scale(1.08);
-            box-shadow: 0 0 30px rgba(195, 0, 255, 0.9);
         }
 
         .tabButton.active {
-            background: linear-gradient(135deg, #c300ff, #ff00aa);
-            box-shadow: 0 0 25px #ff00aa;
+            background: #ff00aa;
         }
 
         #tabs {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             padding: 10px;
         }
 
-        #content {
-            padding: 20px;
+        #content > div {
+            display: none;
         }
 
-        .panel {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .item {
-            background: rgba(20, 0, 50, 0.7);
-            border: 1px solid #6a00ff;
-            border-radius: 12px;
-            padding: 12px;
-            margin: 10px 0;
-            box-shadow: 0 0 15px rgba(106, 0, 255, 0.4);
-        }
-
-        .smallBtn {
-            background: #00d4ff;
-            color: black;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            margin: 4px;
-            cursor: pointer;
+        #content > div.active {
+            display: block;
         }
 
         #chestContainer {
@@ -113,98 +65,53 @@
             margin: 20px 0;
         }
 
-        .chest-icon {
-            font-size: 80px;
+        #chestIcon {
+            font-size: 90px;
             cursor: pointer;
-            transition: all 0.4s;
-            filter: drop-shadow(0 0 15px #ffd700);
+            transition: all 0.3s;
         }
 
-        .chest-icon:hover {
-            transform: scale(1.15) rotate(10deg);
-            filter: drop-shadow(0 0 30px #ff4500);
-        }
-
-        .chest-opening {
-            animation: chestEpicOpen 1.2s ease-out;
-        }
-
-        @keyframes chestEpicOpen {
-            0% { transform: scale(1) rotateY(0deg); }
-            40% { transform: scale(1.4) rotateY(180deg); filter: brightness(2) drop-shadow(0 0 60px #ff00ff); }
-            70% { transform: scale(1.6) rotateY(360deg); filter: brightness(3) drop-shadow(0 0 100px #00ff88); }
-            100% { transform: scale(1) rotateY(720deg); filter: brightness(1); }
+        #chestIcon:hover {
+            transform: scale(1.2);
         }
 
         .particle {
             position: absolute;
-            width: 6px;
-            height: 6px;
-            background: #ffd700;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             pointer-events: none;
-            animation: burst 0.9s ease-out forwards;
+            animation: burst 0.8s forwards;
         }
 
         @keyframes burst {
-            0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
-            100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+            to { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
         }
 
-        #tutorialPanel {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.92);
-            color: white;
-            padding: 30px;
-            overflow-y: auto;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        #tutorialPanel button {
-            margin-top: 30px;
-            padding: 15px 40px;
-            font-size: 20px;
+        .item {
+            background: rgba(30,0,60,0.7);
+            border: 1px solid #6a00ff;
+            border-radius: 10px;
+            padding: 12px;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
 
-<div id="tutorialPanel">
-    <h2>Hoş Geldin Nebula'ya!</h2>
-    <p style="font-family: Arial; max-width: 600px; line-height: 1.6;">
-        Bu idle oyun, güç topla, item yükselt, rebirth yapıp sonsuza kadar ilerle!<br><br>
-        1. Ortadaki büyük sandığa tıkla (para harca item çıkar).<br>
-        2. Çıkan item'ları tak, güç artsın → pasif para gelsin.<br>
-        3. Item'ları yükselt veya sat.<br>
-        4. Güç biriktir, rebirth yap → Nebula puanı kazan (kalıcı güç artışı).<br>
-        5. Rebirth Shop'ta Nebula ile kalıcı upgrade al.<br>
-        6. Boss yen, achievement tamamla, günlük ödül topla.<br><br>
-        Arka planda bırak, para biriksin. Eğlen!
-    </p>
-    <button onclick="document.getElementById('tutorialPanel').style.display='none'">Başla!</button>
-</div>
-
 <div id="topBar">
-    <div class="stats">💰 Para: <span id="money">1000</span></div>
-    <div class="stats">⚡ Güç: <span id="power">0</span></div>
-    <div class="stats">🌌 Rebirth: <span id="rebirthLevel">0</span> | Nebula: <span id="nebulaPoints">0</span></div>
-    <div class="stats" id="equippedInfo">Takılı: Yok</div>
+    <div class="stats">Para: <span id="money">1000</span></div>
+    <div class="stats">Güç: <span id="power">0</span></div>
+    <div class="stats">Rebirth: <span id="rebirth">0</span> | Nebula: <span id="nebula">0</span></div>
 
     <div id="chestContainer">
-        <div class="chest-icon" id="chestIcon">🗝️</div>
+        <div id="chestIcon">🗝️</div>
     </div>
 
-    <div style="text-align:center; margin:10px;">
-        <button id="musicBtn">🎵 Müzik</button>
-        <button id="rebirthBtn">🔄 Rebirth</button>
-        <button id="resetBtn">💀 Sıfırla</button>
-        <button id="dailyBtn">📅 Günlük</button>
+    <div style="text-align:center">
+        <button id="musicBtn">Müzik</button>
+        <button id="rebirthBtn">Rebirth</button>
+        <button id="resetBtn">Sıfırla</button>
     </div>
 </div>
 
@@ -212,302 +119,75 @@
     <button class="tabButton active" data-tab="inventory">Envanter</button>
     <button class="tabButton" data-tab="shop">Mağaza</button>
     <button class="tabButton" data-tab="rebirthShop">Rebirth Shop</button>
-    <button class="tabButton" data-tab="achievements">Başarılar</button>
 </div>
 
 <div id="content">
-    <div id="inventoryPanel" class="tabContent panel active">
+    <div id="inventory" class="active">
         <h2>Envanter</h2>
-        <div id="inventoryList"></div>
+        <div id="invList"></div>
     </div>
-
-    <div id="shopPanel" class="tabContent panel">
+    <div id="shop">
         <h2>Mağaza</h2>
-        <div id="shopList"></div>
+        <div id="shopItems"></div>
     </div>
-
-    <div id="rebirthShopPanel" class="tabContent panel">
+    <div id="rebirthShop">
         <h2>Rebirth Shop</h2>
-        <div id="rebirthShopList"></div>
-    </div>
-
-    <div id="achievementsPanel" class="tabContent panel">
-        <h2>Başarılar</h2>
-        <div id="achievementsList"></div>
+        <p>Yakında upgrade'ler eklenecek!</p>
     </div>
 </div>
 
-<audio id="bgm" loop preload="auto">
+<audio id="bgm" loop>
     <source src="YOU CAN ASK THE FLOWERSYOU CAN ASK THE FLOWERS (HORROR MIX)(_6TMiEoJeZ9U_).m4a" type="audio/mp4">
 </audio>
 
 <script>
-// ========================
-// MODÜLER YAPILANDIRMA
-// ========================
+// Basit state
+let money = 1000;
+let power = 0;
+let inventory = [];
 
-// 1. State (tek merkezî obje)
-const gameState = {
-    money: 1000,
-    power: 0,
-    rebirthLevel: 0,
-    nebulaPoints: 0,
-    inventory: [],
-    equipped: {},
-    musicOn: false,
-    lastSave: Date.now(),
-    lastDailyClaim: 0,
-    dailyStreak: 0
-};
-
-// 2. DOM Cache & Helper
+// DOM
 const $ = id => document.getElementById(id);
-const $$ = selector => document.querySelectorAll(selector);
 
-const elements = {
-    money: $('money'),
-    power: $('power'),
-    rebirthLevel: $('rebirthLevel'),
-    nebulaPoints: $('nebulaPoints'),
-    equippedInfo: $('equippedInfo'),
-    chestIcon: $('chestIcon'),
-    inventoryList: $('inventoryList'),
-    shopList: $('shopList'),
-    rebirthShopList: $('rebirthShopList'),
-    achievementsList: $('achievementsList'),
-    bgm: $('bgm')
-};
+// Update UI
+function updateUI() {
+    $('money').textContent = money;
+    $('power').textContent = power;
 
-// 3. Utility Functions
-function rand(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function rollRarity() {
-    const r = Math.random();
-    if (r < 0.6) return 'common';
-    if (r < 0.85) return 'rare';
-    if (r < 0.97) return 'epic';
-    return 'legendary';
-}
-
-function calculatePower() {
-    let total = 0;
-    Object.values(gameState.equipped).forEach(id => {
-        const item = gameState.inventory.find(i => i.id === id);
-        if (item) total += item.power * item.level;
-    });
-    gameState.power = total;
-}
-
-function formatNumber(num) {
-    return num.toLocaleString('tr-TR');
-}
-
-// 4. Save / Load
-function saveGame() {
-    gameState.lastSave = Date.now();
-    localStorage.setItem('nebulaV13', JSON.stringify(gameState));
-}
-
-function loadGame() {
-    const saved = localStorage.getItem('nebulaV13');
-    if (saved) {
-        Object.assign(gameState, JSON.parse(saved));
-    }
-    // Offline progress (basit)
-    const offlineMin = Math.floor((Date.now() - gameState.lastSave) / 60000);
-    gameState.money += offlineMin * Math.floor(gameState.power / 10);
-    calculatePower();
-}
-
-// 5. UI Update Modülleri
-function updateMoney() {
-    elements.money.textContent = formatNumber(gameState.money);
-}
-
-function updatePower() {
-    elements.power.textContent = formatNumber(gameState.power);
-}
-
-function updateRebirth() {
-    elements.rebirthLevel.textContent = gameState.rebirthLevel;
-    elements.nebulaPoints.textContent = formatNumber(gameState.nebulaPoints);
-}
-
-function updateEquipped() {
-    let text = "Takılı: ";
-    let has = false;
-    Object.entries(gameState.equipped).forEach(([slot, id]) => {
-        const item = gameState.inventory.find(i => i.id === id);
-        if (item) {
-            text += `${slot}: ${item.name} `;
-            has = true;
-        }
-    });
-    elements.equippedInfo.textContent = has ? text : "Takılı: Yok";
-}
-
-function updateInventory() {
-    const list = elements.inventoryList;
+    const list = $('invList');
     list.innerHTML = '';
-    gameState.inventory.forEach(item => {
-        const div = document.createElement('div');
-        div.className = `item ${item.rarity}`;
-        div.innerHTML = `<b>${item.name}</b><br>Güç: ${item.power} | Seviye: ${item.level}`;
-        const equipBtn = document.createElement('button');
-        equipBtn.className = 'smallBtn';
-        equipBtn.textContent = 'Tak';
-        equipBtn.onclick = () => {
-            gameState.equipped[item.rarity || 'default'] = item.id;
-            updateUI();
-            saveGame();
-        };
-        div.appendChild(equipBtn);
-        list.appendChild(div);
-    });
-}
-
-function updateShop() {
-    const list = elements.shopList;
-    list.innerHTML = '';
-    // Örnek mağaza item'ları (daha fazla eklenebilir)
-    const shopItems = [
-        {name: "Garantili Rare Sandık", cost: 500, action: () => buyChest(true, 'rare')},
-        {name: "Epic Booster", cost: 2000, action: () => { gameState.nebulaPoints += 20; updateUI(); saveGame(); }},
-        {name: "Para Paketi (5k)", cost: 1000, action: () => { gameState.money += 5000; updateUI(); saveGame(); }}
-    ];
-    shopItems.forEach(item => {
+    inventory.forEach(item => {
         const div = document.createElement('div');
         div.className = 'item';
-        div.innerHTML = `<b>${item.name}</b> - ${formatNumber(item.cost)} 💰`;
-        const btn = document.createElement('button');
-        btn.className = 'smallBtn';
-        btn.textContent = 'Satın Al';
-        btn.onclick = () => {
-            if (gameState.money >= item.cost) {
-                gameState.money -= item.cost;
-                item.action();
-                updateUI();
-                saveGame();
-            } else alert("Para yetmez!");
-        };
-        div.appendChild(btn);
+        div.innerHTML = `${item.name} - Güç: ${item.power}`;
         list.appendChild(div);
     });
 }
 
-function updateRebirthShop() {
-    // Rebirth shop burada olacak (daha sonra genişletilebilir)
-    const list = elements.rebirthShopList;
-    list.innerHTML = '<p>Rebirth puanınla kalıcı upgrade'ler yakında eklenecek!</p>';
-}
-
-function updateAchievements() {
-    const list = elements.achievementsList;
-    list.innerHTML = '<p>Başarılar yakında eklenecek!</p>';
-}
-
-function updateUI() {
-    updateMoney();
-    updatePower();
-    updateRebirth();
-    updateEquipped();
-    updateInventory();
-    updateShop();
-    updateRebirthShop();
-    updateAchievements();
-}
-
-// 6. Chest & Animasyon
+// Sandık aç
 function openChest() {
-    const cost = 100 + Math.floor(gameState.power / 10);
-    if (gameState.money < cost) return alert(`Para yetmez! (${cost} lazım)`);
-    gameState.money -= cost;
+    if (money < 100) return alert("Para yetmez aq!");
+    money -= 100;
 
-    const rarity = rollRarity();
     const item = {
-        id: Date.now(),
-        name: rarity.toUpperCase() + " Item",
-        rarity,
-        power: rarity === 'common' ? rand(5,15) : rarity === 'rare' ? rand(15,30) : rarity === 'epic' ? rand(30,60) : rand(60,100),
-        level: 1
+        name: 'Yeni Item',
+        power: Math.floor(Math.random() * 20) + 5
     };
+    inventory.push(item);
+    power += item.power;
 
-    gameState.inventory.push(item);
-    animateChestOpen();
+    animateChest();
     updateUI();
-    saveGame();
 }
 
-function animateChestOpen() {
+// Efekt
+function animateChest() {
     const icon = $('chestIcon');
-    icon.classList.add('chest-opening');
-    setTimeout(() => icon.classList.remove('chest-opening'), 1200);
+    icon.style.transform = 'scale(1.5)';
+    setTimeout(() => icon.style.transform = 'scale(1)', 300);
 
-    const container = $('chestContainer');
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 20; i++) {
         const p = document.createElement('div');
         p.className = 'particle';
         p.style.left = '50%';
-        p.style.top = '50%';
-        p.style.setProperty('--dx', (Math.random() - 0.5) * 200 + 'px');
-        p.style.setProperty('--dy', (Math.random() - 0.5) * 200 + 'px');
-        p.style.background = ['#ffd700', '#ff4500', '#ff00ff', '#00ff88'][rand(0,3)];
-        container.appendChild(p);
-        setTimeout(() => p.remove(), 1200);
-    }
-
-    if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
-}
-
-// 7. Event Bindings
-function bindEvents() {
-    $('chestIcon').addEventListener('click', openChest);
-    $('musicBtn').addEventListener('click', () => {
-        gameState.musicOn = !gameState.musicOn;
-        const audio = $('bgm');
-        if (gameState.musicOn) {
-            audio.play().catch(() => alert("Müzik için ekrana dokun!"));
-        } else {
-            audio.pause();
-        }
-    });
-    $('rebirthBtn').addEventListener('click', () => alert("Rebirth yakında!"));
-    $('resetBtn').addEventListener('click', () => {
-        if (confirm("Tüm ilerleme silinecek!")) {
-            localStorage.clear();
-            location.reload();
-        }
-    });
-    $('dailyBtn').addEventListener('click', () => alert("Günlük ödül yakında!"));
-
-    $$('.tabButton').forEach(btn => {
-        btn.addEventListener('click', () => {
-            $$('.tabContent').forEach(p => p.classList.remove('active'));
-            $$('.tabButton').forEach(b => b.classList.remove('active'));
-            $(btn.dataset.tab + 'Panel').classList.add('active');
-            btn.classList.add('active');
-        });
-    });
-}
-
-// 8. Init
-document.addEventListener('DOMContentLoaded', () => {
-    loadGame();
-    updateUI();
-    bindEvents();
-
-    // Auto save
-    setInterval(() => {
-        saveGame();
-    }, 10000);
-
-    // Tutorial auto close
-    setTimeout(() => {
-        $('tutorialPanel').style.display = 'none';
-    }, 30000);
-});
-</script>
-</body>
-</html>
+        p.style.top = '50%
